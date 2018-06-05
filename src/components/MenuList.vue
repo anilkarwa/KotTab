@@ -8,7 +8,7 @@
       :clipped-left="$vuetify.breakpoint.mdAndUp"
       fixed>
       <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
-        <span class="hidden-sm-and-down">KotTab - Food Menu</span>
+        <span class="hidden-sm-and-down">Table Number - {{ displayTableNumber($route.params.tableNumber) }}</span>
       </v-toolbar-title>
       <v-text-field
         v-model="search"
@@ -25,7 +25,7 @@
             <template v-for="(item, index) in items.slice(0, 6)" >
               <v-subheader v-if="item.header" :key="item.header">{{ item.header }}</v-subheader>
               <v-divider v-else-if="item.divider" :inset="item.inset" :key="index"></v-divider>
-              <v-list-tile v-else :key="item.title" avatar @click="">
+              <v-list-tile v-else :key="item.title" avatar >
                 <v-list-tile-avatar>
                   <img :src="item.avatar" >
                 </v-list-tile-avatar>
@@ -61,8 +61,20 @@ export default {
       ]
     }
   },
+  mounted () {
+    const url = process.env.API_BASE.concat('/api/AuthenticateUser?')
+    console.log('ENV', url)
+  },
   props: {
     source: String
+  },
+  methods: {
+    displayTableNumber (number) {
+      if (!(number === undefined)) {
+        localStorage.setItem('TableNumber', number)
+      }
+      return localStorage.getItem('TableNumber')
+    }
   }
 }
 </script>
