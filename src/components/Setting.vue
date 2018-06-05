@@ -71,7 +71,6 @@ export default {
   methods: {
     menuSelection: (id) => {
       if (id === 1) {
-        console.log('Printer Setting')
         router.push({name: 'Printer'})
       } else if (id === 2) {
         console.log('Occupied Tables')
@@ -80,7 +79,6 @@ export default {
         console.log('Vacant Tables')
         router.push({name: 'VacantTables', params: {listTableType: 'Vacant Tables'}})
       }
-      // this.$router.push({name: 'Tables', params: {categoryName: this.categoryName}})
     }
   }
 }

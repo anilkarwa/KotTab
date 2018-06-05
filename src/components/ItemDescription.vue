@@ -21,6 +21,32 @@
       <v-spacer></v-spacer>
     </v-toolbar>
     <v-content>
+      <v-flex xs12 sm12 style="margin: 3%">
+        <v-card>
+          <v-card-media
+            class="white--text"
+            height="70px"
+            style="background-color:#00838F;">
+            <v-container fill-height fluid>
+              <v-layout fill-height>
+                <v-flex class="text-xs-center" xs12 align-end flexbox>
+                  <span class="headline">ADD ITEM</span>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-card-media>
+          <v-card-title>
+            <div>
+              <span>Whitehaven Beach</span><br>
+              <span>Whitsunday Island, Whitsunday Islands</span>
+            </div>
+          </v-card-title>
+          <v-card-actions>
+            <v-btn flat color="orange">Share</v-btn>
+            <v-btn flat color="orange">Explore</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
         <!-- <v-list two-line :search="search">
             <template v-for="(item, index) in items.slice(0, 6)" >
               <v-subheader v-if="item.header" :key="item.header">{{ item.header }}</v-subheader>

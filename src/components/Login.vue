@@ -15,8 +15,8 @@
                   <v-text-field 
                   v-model="loginDetails.username"
                   id="username"
-                  :rules="emailRules"
-                  label="Email" required ></v-text-field>
+                  :rules="userNameRules"
+                  label="Username" required ></v-text-field>
                   <v-text-field 
                   v-model="loginDetails.password"
                   id="password" 
@@ -45,7 +45,7 @@
 </div>
 </template>
 <script>
-// import router from '../router'
+import router from '../router'
 import axios from './Services/httpClient.js'
 export default {
   data () {
@@ -55,13 +55,13 @@ export default {
         username: '',
         password: ''
       },
-      emailRules: [
-        v => !!v || 'Password is required',
-        v => v.length <= 25 || 'Password must be less than 25 characters'
+      userNameRules: [
+        v => !!v || 'Username is required',
+        v => v.length <= 25 || 'Username must be less than 25 characters'
       ],
       passwordRules: [
         v => !!v || 'Password is required',
-        v => v.length <= 25 || 'Password must be less than 25 characters'
+        v => v.length <= 50 || 'Password must be less than 50 characters'
       ],
       snackbar: false,
       snackbarColor: 'error',
@@ -77,10 +77,8 @@ export default {
         const password = this.loginDetails.password
         axios.Login(name, password).then((response) => {
           if (!(response.length === 0)) {
-            console.log('Response: --', response[0].UserID)
             localStorage.setItem('UserID', response[0].UserID)
-            // localStorage.setItem('CompanyName', response[0].CompName)
-            // router.push({name: 'Menu', params: {resource: 'Test'}})
+            router.push({name: 'Setting', params: {resource: 'Test'}})
           } else {
             console.log('Invalid Username password')
             this.snackbarText = 'Invalid Credentials'
@@ -90,21 +88,6 @@ export default {
       } else {
         this.$refs.form.validate()
       }
-      // const self = this
-      // const name = this.loginDetails.username
-      // console.log('Name', )
-      // console.log('Password', this.passwordRules.v)
-      // if (self.name && self.password) {
-      //   console.log('Name', self.name)
-      //   console.log('Password', self.password)
-      //   console.log('COming inside')
-      //   axios.Login().then(response => {
-      //     console.log('Final response', response.data)
-      //   })
-      //   // router.push({name: 'Menu', params: {resource: 'Test'}})
-      // } else {
-      //   console.log('Test Description')
-      // }
     }
   }
 }

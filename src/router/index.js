@@ -61,11 +61,11 @@ const router = new Router({
   ]
 })
 router.beforeEach((to, from, next) => {
-  console.log(to.name, localStorage.getItem('DatabaseName'))
-  if (to.name === 'Login' && localStorage.getItem('DatabaseName')) {
+  console.log(to.name, localStorage.getItem('UserID'))
+  if (to.name === 'Login' && localStorage.getItem('UserID')) {
     next('/setting')
   }
-  if ((to.name !== 'Login' && from.name !== 'Login') && !localStorage.getItem('DatabaseName')) {
+  if ((to.name !== 'Login' && from.name !== 'Login') && !localStorage.getItem('UserID')) {
     next('/')
   }
   next()

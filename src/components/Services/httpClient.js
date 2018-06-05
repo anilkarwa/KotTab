@@ -40,5 +40,26 @@ class Axios {
       return Response.data
     })
   }
+  getFoodItemList () {
+    const getFoodItemListUrl = process.env.API_BASE.concat('/api/Items')
+    return this.axios.get(getFoodItemListUrl, {
+      timeout: 50000
+    }).then((Response) => {
+      console.log('Response--Food Item List', Response.data)
+      return Response.data
+    })
+  }
+  getFilteredItemList (key) {
+    if (key) {
+      const beforeUrl = process.env.API_BASE.concat('/api/Items?term=')
+      const getFilterFoodListUrl = beforeUrl.concat(key)
+      return this.axios.get(getFilterFoodListUrl, {
+        timeout: 50000
+      }).then((Response) => {
+        // console.log('Filter Response Array', Response.data)
+        return Response.data
+      })
+    }
+  }
 }
 export default new Axios()
