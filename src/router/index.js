@@ -2,13 +2,16 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/Login'
 import Setting from '@/components/Setting'
-import TableList from '@/components/TableList'
 import MenuList from '@/components/MenuList'
 import Test from '@/components/Test'
+import Printer from '@/components/Printers'
+import OccupiedTables from '@/components/OccupiedTables'
+import VacantTables from '@/components/VacantTables'
+import ItemDescription from '@/components/ItemDescription'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
@@ -22,11 +25,6 @@ export default new Router({
       component: Setting
     },
     {
-      path: '/table',
-      name: 'TableList',
-      component: TableList
-    },
-    {
       path: '/menu',
       name: 'MenuList',
       component: MenuList
@@ -35,6 +33,41 @@ export default new Router({
       path: '/test',
       name: 'Test',
       component: Test
+    },
+    {
+      path: '/printer',
+      name: 'Printer',
+      component: Printer
+    },
+    {
+      path: '/ot',
+      name: 'OccupiedTables',
+      component: OccupiedTables
+    },
+    {
+      path: '/vt',
+      name: 'VacantTables',
+      component: VacantTables
+    },
+    {
+      path: '/description',
+      name: 'ItemDescription',
+      component: ItemDescription
+    },
+    {
+      path: '*',
+      redirect: '/home'
     }
   ]
 })
+router.beforeEach((to, from, next) => {
+  console.log(to.name, localStorage.getItem('UserID'))
+  if (to.name === 'Login' && localStorage.getItem('UserID')) {
+    next('/setting')
+  }
+  if ((to.name !== 'Login' && from.name !== 'Login') && !localStorage.getItem('UserID')) {
+    next('/')
+  }
+  next()
+})
+export default router
