@@ -20,6 +20,9 @@
         @input="foodFilter()"
       ></v-text-field>
       <v-spacer></v-spacer>
+      <v-btn flat icon color="white" @click="checkout()">
+        <v-icon>thumb_up</v-icon>
+      </v-btn>
     </v-toolbar>
     <v-content>
         <v-list two-line :search="search">
@@ -49,7 +52,7 @@
             <v-toolbar-title>Settings</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-toolbar-items>
-              <v-btn dark flat @click.native="dialog = false">Save</v-btn>
+              <v-btn dark flat @click.native="addItemIncart()">Save</v-btn>
             </v-toolbar-items>
           </v-toolbar>
          
@@ -65,23 +68,39 @@
             </v-container>
           </v-card-title>
           <v-container>
-            <v-flex class="text-xs-center" xs12 align-end flexbox>
-                  <span>Item Name:</span><span>Coffee</span>
+            <v-flex xs12 align-end flexbox>
+                  <span style="font-size:25px;margin-right:1%">Item Name:</span>
+                  <span style="font-size:25px;color:red">{{ items.ItemName }}</span>
             </v-flex>
-            <v-flex class="text-xs-center" xs12 align-end flexbox>
-                  <span>Quntity:</span>
-                  <v-btn fab dark small color="red" @click="Quntity = Quntity-1"><v-icon dark>remove</v-icon></v-btn>
-                  {{ Quntity }}
-                  <v-btn fab dark small color="green" @click="Quntity = Quntity+1"><v-icon dark>add</v-icon></v-btn>
+            <v-divider></v-divider>
+            <v-flex xs12 align-end flexbox>
+                  <span style="font-size:25px;margin-right:1%">Quntity:</span>
+                  <v-btn fab dark small color="red" @click="removeOrder()"><v-icon dark>remove</v-icon></v-btn>
+                  <span style="font-size:20px;color:red">{{ items.KOTQuantity }}</span>
+                  <v-btn fab dark small color="green" @click="addOrder()"><v-icon dark>add</v-icon></v-btn>
             </v-flex>
-            <v-flex class="text-xs-center" xs5 align-end flexbox>
+            <v-divider></v-divider>
+            <v-flex xs12 align-end flexbox>
+              <v-text-field
+                v-model="items.KOTRate"
+                label="Rate"
+                @input="calculateAmount()"
+              ></v-text-field>
+            </v-flex>
+             <v-flex xs12 align-end flexbox>
+              <v-text-field
+                v-model="items.KOTAmount"
+                label="Amount"
+                disabled
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 align-end flexbox>
                <v-text-field
-                
+               v-model="items.AdditionalInstructions"
                 color="teal"
-                multi-line
-              >
+                multi-line>
                 <div slot="label">
-                  Bio <small>(optional)</small>
+                  Additional Note: <small>(optional)</small>
                 </div>
               </v-text-field>
             </v-flex>
@@ -95,29 +114,26 @@
 </div>
 </template>
 <script>
+import router from '../router'
 import axios from './Services/httpClient.js'
 export default {
   data () {
     return {
-      Quntity: 0,
-      dialog: true,
+      dialog: false,
       drawer: null,
       search: '',
       notifications: false,
       sound: true,
       widgets: false,
-      items: [
-        { header: 'Food Item List' },
-        { avatar: 'https://vuetifyjs.com/static/doc-images/lists/1.jpg', title: 'Brunch this weekend?', subtitle: "<span class='text--primary'>Ali Connors</span> &mdash; I'll be in your neighborhood doing errands this weekend. Do you want to hang out?" },
-        { divider: true, inset: true },
-        { avatar: 'https://vuetifyjs.com/static/doc-images/lists/2.jpg', title: 'Summer BBQ <span class="grey--text text--lighten-1">4</span>', subtitle: "<span class='text--primary'>to Alex, Scott, Jennifer</span> &mdash; Wish I could come, but I'm out of town this weekend." },
-        { divider: true, inset: true },
-        { avatar: 'https://vuetifyjs.com/static/doc-images/lists/3.jpg', title: 'Oui oui', subtitle: "<span class='text--primary'>Sandra Adams</span> &mdash; Do you have Paris recommendations? Have you ever been?" },
-        { divider: true, inset: true },
-        { avatar: 'https://vuetifyjs.com/static/doc-images/lists/4.jpg', title: 'Birthday gift', subtitle: "<span class='text--primary'>Trevor Hansen</span> &mdash; Have any ideas about what we should get Heidi for her birthday?" },
-        { divider: true, inset: true },
-        { avatar: 'https://vuetifyjs.com/static/doc-images/lists/5.jpg', title: 'Recipe to try', subtitle: "<span class='text--primary'>Britta Holt</span> &mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos." }
-      ],
+      items: {
+        ItemId: '',
+        SlNo: '',
+        ItemName: '',
+        KOTQuantity: 1,
+        KOTRate: 1,
+        KOTAmount: 0,
+        AdditionalInstructions: ''
+      },
       foodItem: []
     }
   },
@@ -130,6 +146,7 @@ export default {
   },
   beforeMount () {
     this.loadFoodItem()
+    console.log('LENGTH', this.$parent.Order.length)
   },
   methods: {
     displayTableNumber (name) {
@@ -158,9 +175,62 @@ export default {
       }
     },
     itemSelection (id, name) {
+      const self = this
+      self.items.ItemId = id
+      self.items.SlNo = id
+      self.items.ItemName = name
+      // self.items.KOTQuantity = id
+      // self.items.KOTRate = id
+      self.items.KOTAmount = self.items.KOTQuantity * self.items.KOTRate
+      // self.items.AdditionalInstructions = id
       console.log('ID', id)
       console.log('Name', name)
       this.dialog = true
+    },
+    addOrder () {
+      if (this.items.KOTQuantity >= 1) {
+        this.items.KOTQuantity = this.items.KOTQuantity + 1
+      }
+      this.items.KOTAmount = this.items.KOTQuantity * this.items.KOTRate
+    },
+    removeOrder () {
+      if (this.items.KOTQuantity > 1) {
+        this.items.KOTQuantity = this.items.KOTQuantity - 1
+      }
+      this.items.KOTAmount = this.items.KOTQuantity * this.items.KOTRate
+    },
+    calculateAmount () {
+      this.items.KOTAmount = this.items.KOTQuantity * this.items.KOTRate
+    },
+    addItemIncart () {
+      const self = this
+      if (self.items.ItemId && self.items.SlNo && self.items.ItemName && self.items.KOTQuantity > 0 && self.items.KOTRate > 0 && self.items.KOTAmount === self.items.KOTQuantity * self.items.KOTRate) {
+        console.log('Coming')
+        const preOrderItem = {
+          ItemId: self.items.ItemId,
+          SlNo: self.items.SlNo,
+          KOTQuantity: self.items.KOTQuantity,
+          KOTRate: self.items.KOTRate,
+          KOTAmount: self.items.KOTAmount,
+          AdditionalInstructions: self.items.AdditionalInstructions
+        }
+        if (this.$parent.Order.length === 0) {
+          console.log('YOOO')
+          this.$parent.Order = JSON.parse(localStorage.getItem('Orders'))
+          this.$parent.Order.push(preOrderItem)
+        } else {
+          console.log('ELSEEE')
+          console.log('Local Store Value', JSON.parse(localStorage.getItem('Orders')))
+          this.$parent.Order.push(preOrderItem)
+        }
+        localStorage.setItem('Orders', JSON.stringify(this.$parent.Order))
+        console.log('Local Storage', JSON.parse(localStorage.getItem('Orders')))
+        self.items.AdditionalInstructions = ''
+        this.dialog = false
+      }
+    },
+    checkout () {
+      router.push({name: 'Checkout'})
     }
   }
 }
