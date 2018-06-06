@@ -44,46 +44,52 @@
                 </v-flex>
                 <v-flex xs3 align-end flexbox>
                     <v-select
-                        :items="items"
+                        :items="waiterData"
                         v-model="waiterId"
-                        label="Waiter Id"
+                        label="Select Waiter Id"
                         single-line
-                        color="red"
+                        item-text="WTRName"
+                        item-value="WTRID"
+                        autocomplete
                     ></v-select>
                 </v-flex>
               </v-layout>
             <v-divider></v-divider>
-            <v-flex xs12 align-end flexbox>
-                  <span style="font-size:25px;margin-right:1%">Quntity:</span>
-                  <v-btn fab dark small color="red" @click="removeOrder()"><v-icon dark>remove</v-icon></v-btn>
-                  <span style="font-size:20px;color:red">{{ items.KOTQuantity }}</span>
-                  <v-btn fab dark small color="green" @click="addOrder()"><v-icon dark>add</v-icon></v-btn>
-            </v-flex>
-            <v-divider></v-divider>
-            <v-flex xs12 align-end flexbox>
-              <v-text-field
-                v-model="items.KOTRate"
-                label="Rate"
-                @input="calculateAmount()"
-              ></v-text-field>
-            </v-flex>
-             <v-flex xs12 align-end flexbox>
-              <v-text-field
-                v-model="items.KOTAmount"
-                label="Amount"
-                disabled
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 align-end flexbox>
-               <v-text-field
-               v-model="items.AdditionalInstructions"
-                color="teal"
-                multi-line>
-                <div slot="label">
-                  Additional Note: <small>(optional)</small>
-                </div>
-              </v-text-field>
-            </v-flex>
+               <v-layout row justify-space-between>
+                <v-flex xs6  flexbox>
+                    <span style="font-size:25px;margin-right:1%">Order List:</span>
+                </v-flex>
+                <v-flex xs3 align-end flexbox>
+                    <v-btn depressed color="info">Add Items</v-btn>
+                </v-flex>
+              </v-layout>
+              <v-layout row justify-center>
+                 <v-data-table
+                  :headers="headers"
+                  :items="Orderitems"
+                  hide-actions
+                  class="elevation-1"
+                  >
+                    <template slot="items" slot-scope="props">
+                      <td>{{ props.item.ItemName }}</td>
+                      <td class="text-xs-right">{{ props.item.KOTQuantity }}</td>
+                      <td class="text-xs-right">{{ props.item.KOTRate }}</td>
+                      <td class="text-xs-right">{{ props.item.KOTAmount }}</td>
+                      <!-- <td class="justify-center layout px-0">
+                        <v-btn icon class="mx-0">
+                          <v-icon color="teal">edit</v-icon>
+                        </v-btn>
+                        <v-btn icon class="mx-0">
+                          <v-icon color="pink">delete</v-icon>
+                        </v-btn>
+                      </td> -->
+                    </template>
+                    <template slot="no-data">
+                      <!-- <v-btn color="primary">Reset</v-btn> -->
+                      <p>No Order Available for This Table</p>
+                    </template>
+                  </v-data-table>
+              </v-layout>
           </v-container>
         </v-card>
       </v-flex>
@@ -111,7 +117,36 @@ export default {
         KOTRate: 1,
         KOTAmount: 0,
         AdditionalInstructions: ''
-      }
+      },
+      waiterData: [],
+      headers: [
+        {
+          text: 'Item Name',
+          align: 'left',
+          sortable: false,
+          value: 'name'
+        },
+        { text: 'Quantity', value: 'calories' },
+        { text: 'Rate', value: 'fat' },
+        { text: 'Amount', value: 'carbs' }
+      ],
+      desserts: [],
+      editedIndex: -1,
+      editedItem: {
+        name: '',
+        calories: 0,
+        fat: 0,
+        carbs: 0,
+        protein: 0
+      },
+      defaultItem: {
+        name: '',
+        calories: 0,
+        fat: 0,
+        carbs: 0,
+        protein: 0
+      },
+      Orderitems: []
     }
   },
   mounted () {
@@ -123,6 +158,7 @@ export default {
   },
   beforeMount () {
     this.getWaiterList()
+    this.loadOrderItem()
   },
   methods: {
     displayTableNumber (name) {
@@ -134,7 +170,14 @@ export default {
     getWaiterList () {
       axios.getWaiterList().then((data) => {
         console.log('Waiter Data', data)
+        this.waiterData = data
       })
+    },
+    loadOrderItem () {
+      var Order = []
+      Order = JSON.parse(localStorage.getItem('Orders'))
+      console.log('Order', Order)
+      this.Orderitems = Order
     }
   }
 }

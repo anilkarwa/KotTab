@@ -204,16 +204,23 @@ export default {
     },
     addItemIncart () {
       const self = this
+      console.log('TTT', localStorage.getItem('Orders'))
+      if (!localStorage.getItem('Orders')) {
+        console.log('Yhai hai bhai vo')
+        localStorage.setItem('Orders', JSON.stringify(this.$parent.Order))
+      }
       if (self.items.ItemId && self.items.SlNo && self.items.ItemName && self.items.KOTQuantity > 0 && self.items.KOTRate > 0 && self.items.KOTAmount === self.items.KOTQuantity * self.items.KOTRate) {
         console.log('Coming')
         const preOrderItem = {
           ItemId: self.items.ItemId,
+          ItemName: self.items.ItemName,
           SlNo: self.items.SlNo,
           KOTQuantity: self.items.KOTQuantity,
           KOTRate: self.items.KOTRate,
           KOTAmount: self.items.KOTAmount,
           AdditionalInstructions: self.items.AdditionalInstructions
         }
+        console.log('Test 1', localStorage.getItem('Orders'))
         if (this.$parent.Order.length === 0) {
           console.log('YOOO')
           this.$parent.Order = JSON.parse(localStorage.getItem('Orders'))

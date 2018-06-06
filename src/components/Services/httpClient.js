@@ -62,7 +62,7 @@ class Axios {
     }
   }
   getWaiterList () {
-    const getWaiterUrl = process.env.API_BASE.concat('api/WaiterList')
+    const getWaiterUrl = process.env.API_BASE.concat('/api/WaiterList')
     return this.axios.get(getWaiterUrl, {
       timeout: 50000
     }).then((Response) => {
