@@ -8,6 +8,7 @@ import Printer from '@/components/Printers'
 import OccupiedTables from '@/components/OccupiedTables'
 import VacantTables from '@/components/VacantTables'
 import ItemDescription from '@/components/ItemDescription'
+import Checkout from '@/components/Checkout'
 
 Vue.use(Router)
 
@@ -53,6 +54,11 @@ const router = new Router({
       path: '/description',
       name: 'ItemDescription',
       component: ItemDescription
+    },
+    {
+      path: '/checkout',
+      name: 'Checkout',
+      component: Checkout
     },
     {
       path: '*',

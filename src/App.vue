@@ -9,7 +9,12 @@
 <script>
 import 'vuetify/dist/vuetify.min.css'
 export default {
-  name: 'app'
+  name: 'app',
+  data () {
+    return {
+      Order: []
+    }
+  }
 }
 </script>
 
