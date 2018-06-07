@@ -21,7 +21,7 @@
       ></v-text-field>
       <v-spacer></v-spacer>
       <v-btn flat icon color="white" @click="checkout()">
-        <v-icon>thumb_up</v-icon>
+        <v-icon>assignment_turned_in</v-icon>
       </v-btn>
     </v-toolbar>
     <v-content>
@@ -40,7 +40,7 @@
               <v-layout row justify-space-between>
                 <v-flex xs6  flexbox>
                     <span style="font-size:25px;margin-right:1%">Table Number:</span>
-                    <span style="font-size:25px;color:red"> 1 </span>
+                    <span style="font-size:25px;color:red"> {{ displayTableNumber($route.params.tableName) }} </span>
                 </v-flex>
                 <v-flex xs3 align-end flexbox>
                     <v-select
@@ -178,6 +178,27 @@ export default {
       Order = JSON.parse(localStorage.getItem('Orders'))
       console.log('Order', Order)
       this.Orderitems = Order
+    },
+    checkout () {
+      console.log('Final Order', this.Orderitems)
+      var today = new Date()
+      console.log('Full date', today)
+      var date = today.getDate()
+      var month = today.getMonth() + 1
+      if (month < 10) {
+        month = '0' + month
+      }
+      (date < 10) ? date = '0' + date : date = today.getDate
+      var year = today.getFullYear()
+      console.log('DATE', date)
+      console.log('MONTH', month)
+      console.log('YEAR', year)
+      var FinalOrder = {
+        TableId: localStorage.getItem('TableNumber'),
+        AddedBy: 'User 1',
+        KOTDate: year + '-' + month + '-' + date
+      }
+      console.log('Final Order', FinalOrder)
     }
   }
 }

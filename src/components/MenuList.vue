@@ -8,7 +8,7 @@
       :clipped-left="$vuetify.breakpoint.mdAndUp"
       fixed>
       <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
-        <span class="hidden-sm-and-down">Table Number - {{ displayTableNumber($route.params.tableName) }}</span>
+        <span class="hidden-sm-and-down">Table Number - {{ displayTableNumber($route.params.tableName,$route.params.tableNumber) }}</span>
       </v-toolbar-title>
       <v-text-field
         v-model="search"
@@ -149,9 +149,12 @@ export default {
     console.log('LENGTH', this.$parent.Order.length)
   },
   methods: {
-    displayTableNumber (name) {
+    displayTableNumber (name, number) {
       if (!(name === undefined)) {
         localStorage.setItem('TableName', name)
+      }
+      if (!(number === undefined)) {
+        localStorage.setItem('TableNumber', number)
       }
       return localStorage.getItem('TableName')
     },
