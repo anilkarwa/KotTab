@@ -39,7 +39,7 @@
               </v-layout>
             </v-container>
           </v-card-title>
-          <v-container>
+          <v-container >
               <v-layout row justify-space-between>
                 <v-flex xs6  flexbox>
                     <span style="font-size:25px;margin-right:1%">Table Number:</span>
@@ -122,13 +122,18 @@
                     </template>
                   </v-data-table>
               </v-layout>
+              <v-layout row justify-center>
+                <v-btn color="success" dark large @click="sendForPayment">Send for Payment</v-btn>
+              </v-layout>
           </v-container>
         </v-card>
       </v-flex>
     </v-content>
+    
       <v-snackbar
         :timeout="timeout2"
         :top="y === 'top'"
+        :bottom="y === 'bottom'"
         :vertical="mode === 'multi-line'"
         :color="snackbar2color"
         v-model="snackbar2"
@@ -195,9 +200,9 @@ export default {
       activeOrderItems: [],
       snackbar2: false,
       timeout2: 6000,
-      snackbar2text: 'Order placed Successfully',
+      snackbar2text: '',
       snackbar2color: 'success',
-      y: 'bottom',
+      y: '',
       mode: '',
       KOTNumber: 0
     }
@@ -250,6 +255,8 @@ export default {
         if (data.status === 200) {
           localStorage.removeItem('Orders')
           this.$parent.Order = []
+          this.y = 'bottom'
+          this.snackbar2text = 'Order placed Successfully'
           this.snackbar2 = true
           setTimeout(function () {
             router.push({name: 'Setting'})
@@ -306,6 +313,18 @@ export default {
         this.KOTNumber = localStorage.getItem('KOTNumber')
         this.waiterId = localStorage.getItem('WaiterId')
         this.activeOrderItems = JSON.parse(localStorage.getItem('activeOrders'))
+      })
+    },
+    sendForPayment () {
+      axios.sendForPayment(localStorage.getItem('TableNumber')).then((data) => {
+        if (data.status === 200) {
+          this.y = 'top'
+          this.snackbar2text = 'Successfully send for payment'
+          this.snackbar2 = true
+          setTimeout(function () {
+            router.push({name: 'Setting'})
+          }, 3000)
+        }
       })
     }
   }
