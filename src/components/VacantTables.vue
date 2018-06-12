@@ -34,8 +34,9 @@ export default {
   },
   methods: {
     selectTable (tableNumber, tableName) {
-      console.log('Selected Table Number', tableNumber)
-      console.log('Selected Table Name', tableName)
+      localStorage.setItem('Orders', [])
+      localStorage.setItem('activeOrders', [])
+      localStorage.setItem('pointingTable', 'VacantTables')
       router.push({name: 'MenuList', params: {tableNumber: tableNumber, tableName: tableName}})
     },
     displayTitle (name) {

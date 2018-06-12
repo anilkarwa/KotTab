@@ -9,6 +9,7 @@ import OccupiedTables from '@/components/OccupiedTables'
 import VacantTables from '@/components/VacantTables'
 import ItemDescription from '@/components/ItemDescription'
 import Checkout from '@/components/Checkout'
+import ActiveOrder from '@/components/ActiveOrder'
 
 Vue.use(Router)
 
@@ -61,6 +62,11 @@ const router = new Router({
       component: Checkout
     },
     {
+      path: '/activeorder',
+      name: 'ActiveOrder',
+      component: ActiveOrder
+    },
+    {
       path: '*',
       redirect: '/home'
     }
@@ -69,10 +75,10 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   console.log(to.name, localStorage.getItem('UserID'))
   if (to.name === 'Login' && localStorage.getItem('UserID')) {
-    next('/setting')
+    return next('/setting')
   }
   if ((to.name !== 'Login' && from.name !== 'Login') && !localStorage.getItem('UserID')) {
-    next('/')
+    return next('/')
   }
   next()
 })

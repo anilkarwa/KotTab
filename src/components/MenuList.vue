@@ -29,7 +29,7 @@
             <template v-for="(item, index) in foodItem">
               <!-- <v-subheader :key="item.ItemCode">Food Item List</v-subheader> -->
               <!-- <v-divider :key="index"></v-divider> -->
-              <v-list-tile :key="item.title" avatar @click="itemSelection(item.ItemID,item.ItemName)">
+              <v-list-tile :key="item.title" avatar @click="itemSelection(item.ItemID,item.ItemName,item.ItemRate)">
                 <v-list-tile-avatar>
                   <img src="./../assets/dinner.svg" >
                 </v-list-tile-avatar>
@@ -85,6 +85,7 @@
                 v-model="items.KOTRate"
                 label="Rate"
                 @input="calculateAmount()"
+                disabled
               ></v-text-field>
             </v-flex>
              <v-flex xs12 align-end flexbox>
@@ -110,6 +111,15 @@
         </v-card>
       </v-dialog>
     </v-layout>
+    <v-snackbar
+        :timeout="timeout"
+        :bottom="y === 'bottom'"
+        :vertical="mode === 'vertical'"
+        :color="snackbarcolor"
+        v-model="snackbar">
+        {{ snackbartext }}
+        <v-btn flat color="black" @click.native="snackbar2 = false">Close</v-btn>
+      </v-snackbar>
   </v-app>
 </div>
 </template>
@@ -130,11 +140,17 @@ export default {
         SlNo: '',
         ItemName: '',
         KOTQuantity: 1,
-        KOTRate: 1,
+        KOTRate: 0,
         KOTAmount: 0,
         AdditionalInstructions: ''
       },
-      foodItem: []
+      foodItem: [],
+      timeout: 2000,
+      y: 'bottom',
+      mode: '',
+      snackbarcolor: 'success',
+      snackbar: false,
+      snackbartext: 'Item Added Successfully'
     }
   },
   mounted () {
@@ -146,7 +162,6 @@ export default {
   },
   beforeMount () {
     this.loadFoodItem()
-    console.log('LENGTH', this.$parent.Order.length)
   },
   methods: {
     displayTableNumber (name, number) {
@@ -177,13 +192,13 @@ export default {
         })
       }
     },
-    itemSelection (id, name) {
+    itemSelection (id, name, rate) {
       const self = this
       self.items.ItemId = id
       self.items.SlNo = id
       self.items.ItemName = name
       // self.items.KOTQuantity = id
-      // self.items.KOTRate = id
+      self.items.KOTRate = rate
       self.items.KOTAmount = self.items.KOTQuantity * self.items.KOTRate
       // self.items.AdditionalInstructions = id
       console.log('ID', id)
@@ -236,11 +251,19 @@ export default {
         localStorage.setItem('Orders', JSON.stringify(this.$parent.Order))
         console.log('Local Storage', JSON.parse(localStorage.getItem('Orders')))
         self.items.AdditionalInstructions = ''
+        this.items.KOTQuantity = 1
+        this.snackbar = true
         this.dialog = false
       }
     },
     checkout () {
-      router.push({name: 'Checkout'})
+      console.log('COming inside')
+      if (localStorage.getItem('pointingTable') === 'VacantTables') {
+        router.push({name: 'Checkout'})
+      }
+      if (localStorage.getItem('pointingTable') === 'OccupiedTables') {
+        router.push({name: 'ActiveOrder'})
+      }
     }
   }
 }

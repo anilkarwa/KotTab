@@ -10,15 +10,6 @@
       <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
         <span class="hidden-sm-and-down">Table Number - {{ displayTableNumber($route.params.tableName) }}</span>
       </v-toolbar-title>
-      <v-text-field
-        v-model="search"
-        flat
-        solo-inverted
-        prepend-icon="search"
-        label="Search"
-        class="hidden-sm-and-down"
-        @input="foodFilter()"
-      ></v-text-field>
       <v-spacer></v-spacer>
       <v-btn flat icon color="white" @click="checkout()">
         <v-icon>assignment_turned_in</v-icon>
@@ -60,7 +51,9 @@
                     <span style="font-size:25px;margin-right:1%">Order List:</span>
                 </v-flex>
                 <v-flex xs3 align-end flexbox>
+                  <router-link to="/menu">
                     <v-btn depressed color="info">Add Items</v-btn>
+                  </router-link>
                 </v-flex>
               </v-layout>
               <v-layout row justify-center>
@@ -91,6 +84,25 @@
                   </v-data-table>
               </v-layout>
           </v-container>
+           <v-snackbar
+        :timeout="timeout"
+        :top="y === 'top'"
+        :vertical="mode === 'vertical'"
+        v-model="snackbar"
+      >
+        {{ text }}
+        <v-btn flat color="pink" @click.native="snackbar = false">Close</v-btn>
+      </v-snackbar>
+
+        <v-snackbar
+        :timeout="timeout2"
+        :bottom="y2 === 'bottom'"
+        :vertical="mode === 'multi-line'"
+        :color="snackbar2color"
+        v-model="snackbar2">
+        {{ snackbar2text }}
+        <v-btn flat color="black" @click.native="snackbar2 = false">Close</v-btn>
+      </v-snackbar>
         </v-card>
       </v-flex>
     </v-content>
@@ -99,16 +111,12 @@
 </template>
 <script>
 import axios from './Services/httpClient.js'
+import router from '../router'
 export default {
   data () {
     return {
-      dialog: false,
       drawer: null,
-      search: '',
-      notifications: false,
-      sound: true,
-      widgets: false,
-      waiterId: '',
+      waiterId: null,
       items: {
         ItemId: '',
         SlNo: '',
@@ -126,27 +134,22 @@ export default {
           sortable: false,
           value: 'name'
         },
-        { text: 'Quantity', value: 'calories' },
-        { text: 'Rate', value: 'fat' },
-        { text: 'Amount', value: 'carbs' }
+        { text: 'Quantity', value: 'Quantity' },
+        { text: 'Rate', value: 'Rate' },
+        { text: 'Amount', value: 'Amount' }
       ],
-      desserts: [],
-      editedIndex: -1,
-      editedItem: {
-        name: '',
-        calories: 0,
-        fat: 0,
-        carbs: 0,
-        protein: 0
-      },
-      defaultItem: {
-        name: '',
-        calories: 0,
-        fat: 0,
-        carbs: 0,
-        protein: 0
-      },
-      Orderitems: []
+      Orderitems: [],
+      snackbar: false,
+      snackbar2: false,
+      y: 'top',
+      y2: 'bottom',
+      x: null,
+      mode: '',
+      timeout: 3000,
+      timeout2: 6000,
+      text: 'Please Select the WaiterID',
+      snackbar2text: 'Order placed Successfully',
+      snackbar2color: 'success'
     }
   },
   mounted () {
@@ -175,30 +178,71 @@ export default {
     },
     loadOrderItem () {
       var Order = []
-      Order = JSON.parse(localStorage.getItem('Orders'))
+      if (localStorage.getItem('Orders')) {
+        Order = JSON.parse(localStorage.getItem('Orders'))
+      }
       console.log('Order', Order)
       this.Orderitems = Order
     },
     checkout () {
-      console.log('Final Order', this.Orderitems)
+      if (this.waiterId) {
+        var FinalOrder = {
+          TableId: localStorage.getItem('TableNumber'),
+          WaiterId: this.waiterId,
+          AddedBy: 'User 1',
+          KOTDate: this.getKOTDate(),
+          TimeOfKOT: this.getKOTTime(),
+          AddedDateTime: this.getKOTDate() + ' ' + this.getKOTTime(),
+          ItemsList: this.Orderitems
+        }
+        // console.log('Current Date:', this.getKOTDate())
+        console.log('Final Order', JSON.stringify(FinalOrder))
+        axios.placeOrder(FinalOrder).then((data) => {
+          if (data.status === 200) {
+            axios.updateTableStatus(localStorage.getItem('TableNumber')).then((response) => {
+              console.log('Changin table status', response)
+            })
+            localStorage.removeItem('Orders')
+            this.$parent.Order = []
+            this.snackbar2 = true
+            setTimeout(function () {
+              router.push({name: 'Setting'})
+            }, 3000)
+          }
+        })
+      } else {
+        this.snackbar = true
+      }
+      // console.log('Final Order', this.Orderitems)
+    },
+    getKOTDate () {
       var today = new Date()
-      console.log('Full date', today)
       var date = today.getDate()
       var month = today.getMonth() + 1
       if (month < 10) {
         month = '0' + month
       }
-      (date < 10) ? date = '0' + date : date = today.getDate
+      (date < 10) ? date = '0' + date : date = today.getDate()
       var year = today.getFullYear()
-      console.log('DATE', date)
-      console.log('MONTH', month)
-      console.log('YEAR', year)
-      var FinalOrder = {
-        TableId: localStorage.getItem('TableNumber'),
-        AddedBy: 'User 1',
-        KOTDate: year + '-' + month + '-' + date
+      var KOTDat = year + '-' + month + '-' + date
+      return KOTDat
+    },
+    getKOTTime () {
+      var today = new Date()
+      var Hour = today.getHours()
+      if (Hour < 10) {
+        Hour = '0' + Hour
       }
-      console.log('Final Order', FinalOrder)
+      var Min = today.getMinutes()
+      if (Min < 10) {
+        Min = '0' + Min
+      }
+      var Sec = today.getSeconds()
+      if (Sec < 10) {
+        Sec = '0' + Sec
+      }
+      var KOTTime = Hour + ':' + Min + ':' + Sec
+      return KOTTime
     }
   }
 }
