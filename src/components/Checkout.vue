@@ -83,6 +83,9 @@
                     </template>
                   </v-data-table>
               </v-layout>
+              <v-layout row justify-center>
+                <v-btn color="success" dark large @click="sendForPayment">Send for Payment</v-btn>
+              </v-layout>
           </v-container>
            <v-snackbar
         :timeout="timeout"
@@ -96,6 +99,7 @@
 
         <v-snackbar
         :timeout="timeout2"
+        :top="y2 === 'top'"
         :bottom="y2 === 'bottom'"
         :vertical="mode === 'multi-line'"
         :color="snackbar2color"
@@ -142,13 +146,13 @@ export default {
       snackbar: false,
       snackbar2: false,
       y: 'top',
-      y2: 'bottom',
+      y2: '',
       x: null,
       mode: '',
       timeout: 3000,
       timeout2: 6000,
       text: 'Please Select the WaiterID',
-      snackbar2text: 'Order placed Successfully',
+      snackbar2text: '',
       snackbar2color: 'success'
     }
   },
@@ -204,6 +208,8 @@ export default {
             })
             localStorage.removeItem('Orders')
             this.$parent.Order = []
+            this.y2 = 'bottom'
+            this.snackbar2text = 'Order placed Successfully'
             this.snackbar2 = true
             setTimeout(function () {
               router.push({name: 'Setting'})
@@ -243,6 +249,18 @@ export default {
       }
       var KOTTime = Hour + ':' + Min + ':' + Sec
       return KOTTime
+    },
+    sendForPayment () {
+      axios.sendForPayment(localStorage.getItem('TableNumber')).then((data) => {
+        if (data.status === 200) {
+          this.y2 = 'top'
+          this.snackbar2text = 'Successfully send for payment'
+          this.snackbar2 = true
+          setTimeout(function () {
+            router.push({name: 'Setting'})
+          }, 3000)
+        }
+      })
     }
   }
 }

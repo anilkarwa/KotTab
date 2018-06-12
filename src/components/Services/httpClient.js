@@ -101,5 +101,15 @@ class Axios {
       }
     })
   }
+  sendForPayment (tableNumber) {
+    return this.axios.request({
+      method: 'GET',
+      url: process.env.API_BASE.concat('/api/UpdateTableStatus?tableId=').concat(tableNumber).concat('&tableStatus=P'),
+      responseType: 'json',
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+  }
 }
 export default new Axios()
