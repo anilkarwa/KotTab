@@ -29,7 +29,7 @@
             <template v-for="(item, index) in foodItem">
               <!-- <v-subheader :key="item.ItemCode">Food Item List</v-subheader> -->
               <!-- <v-divider :key="index"></v-divider> -->
-              <v-list-tile :key="item.title" avatar @click="itemSelection(item.ItemID,item.ItemName,item.ItemRate)">
+              <v-list-tile :key="item.title" avatar @click="itemSelection(item.ItemID,item.ItemName,item.ItemRate,item.KCATID)">
                 <v-list-tile-avatar>
                   <img src="./../assets/dinner.svg" >
                 </v-list-tile-avatar>
@@ -142,6 +142,7 @@ export default {
         KOTQuantity: 1,
         KOTRate: 0,
         KOTAmount: 0,
+        KCATID: '',
         AdditionalInstructions: ''
       },
       foodItem: [],
@@ -192,7 +193,7 @@ export default {
         })
       }
     },
-    itemSelection (id, name, rate) {
+    itemSelection (id, name, rate, counterId) {
       const self = this
       self.items.ItemId = id
       self.items.SlNo = id
@@ -200,6 +201,7 @@ export default {
       // self.items.KOTQuantity = id
       self.items.KOTRate = rate
       self.items.KOTAmount = self.items.KOTQuantity * self.items.KOTRate
+      self.items.KCATID = counterId
       // self.items.AdditionalInstructions = id
       console.log('ID', id)
       console.log('Name', name)
@@ -236,6 +238,7 @@ export default {
           KOTQuantity: self.items.KOTQuantity,
           KOTRate: self.items.KOTRate,
           KOTAmount: self.items.KOTAmount,
+          KCATID: self.items.KCATID,
           AdditionalInstructions: self.items.AdditionalInstructions
         }
         console.log('Test 1', localStorage.getItem('Orders'))
