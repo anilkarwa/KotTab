@@ -200,12 +200,80 @@ export default {
           ItemsList: this.Orderitems
         }
         // console.log('Current Date:', this.getKOTDate())
-        console.log('Final Order', JSON.stringify(FinalOrder))
+        // console.log('Final Order', JSON.stringify(FinalOrder))
+        console.log('Final Order', FinalOrder)
+
+        // Test Code for printer Code ---- Start HERE ------
+        // const orderListForPrinter = FinalOrder.ItemsList
+        // console.log('Priner Order Data', orderListForPrinter)
+        // var KcatIdTable = []
+        // var finalOrderList = []
+
+        // orderListForPrinter.forEach(element => {
+        //   if (KcatIdTable.includes(element.KCATID)) {
+        //     let key
+        //     for (let i = 0; i < finalOrderList.length; i++) {
+        //       if (finalOrderList[i][element.KCATID] !== undefined) {
+        //         key = i
+        //       }
+        //     }
+        //     finalOrderList[key][element.KCATID].push(element)
+        //   } else {
+        //     KcatIdTable.push(element.KCATID)
+        //     let temp = {
+        //       [element.KCATID]: [element]
+        //     }
+        //     finalOrderList.push(temp)
+        //   }
+        // })
+        // finalOrderList.forEach(order => {
+        //   const payload = {
+        //     printerAddress: Object.keys(order)[0],
+        //     printData: order[Object.keys(order)]
+        //   }
+        //   axios.printOrders(payload).then(response => {
+        //     console.log('Response for printing data', response)
+        //   })
+        // })
+        // Test Code for printer Code ---- End HERE ------
+
         axios.placeOrder(FinalOrder).then((data) => {
           if (data.status === 200) {
             axios.updateTableStatus(localStorage.getItem('TableNumber')).then((response) => {
               console.log('Changin table status', response)
             })
+            // Code for Print the order Start here
+            const orderListForPrinter = FinalOrder.ItemsList
+            let KcatIdTable = []
+            let finalOrderList = []
+            orderListForPrinter.forEach(element => {
+              if (KcatIdTable.includes(element.KCATID)) {
+                let key
+                for (let i = 0; i < finalOrderList.length; i++) {
+                  if (finalOrderList[i][element.KCATID] !== undefined) {
+                    key = i
+                  }
+                }
+                finalOrderList[key][element.KCATID].push(element)
+              } else {
+                KcatIdTable.push(element.KCATID)
+                let temp = {
+                  [element.KCATID]: [element]
+                }
+                finalOrderList.push(temp)
+              }
+            })
+            finalOrderList.forEach(order => {
+              const payload = {
+                printerAddress: Object.keys(order)[0],
+                printData: order[Object.keys(order)]
+              }
+              console.log('Payload', payload)
+              axios.printOrders(payload).then(response => {
+                console.log('Response for printing data', response)
+              })
+            })
+            // Code for Print the order End here
             localStorage.removeItem('Orders')
             this.$parent.Order = []
             this.y2 = 'bottom'

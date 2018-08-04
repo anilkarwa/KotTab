@@ -111,5 +111,17 @@ class Axios {
       }
     })
   }
+  printOrders (payload) {
+    return this.axios.request({
+      method: 'POST',
+      // url: process.env.API_BASE.concat('')
+      url: 'http://192.168.31.110/kottab/api/PrintKOT',
+      responseType: 'json',
+      data: payload,
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+  }
 }
 export default new Axios()
