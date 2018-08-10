@@ -4,7 +4,7 @@
       <v-toolbar color="cyan" dark>
             <v-toolbar-title>Printer Settings</v-toolbar-title>
             <v-spacer></v-spacer>
-                    <v-dialog v-model="dialog" max-width="500px">
+          <v-dialog v-model="Newdialog" max-width="500px">
           <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn>
           <v-card>
             <v-card-title>
@@ -35,7 +35,7 @@
   
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
+              <v-btn color="blue darken-1" flat @click="Newdialog = false">Cancel</v-btn>
               <v-btn color="blue darken-1" flat @click="AddNewPrinterData()">Add Data</v-btn>
             </v-card-actions>
           </v-card>
@@ -151,7 +151,6 @@
                 :color="snackbarColor"
                 :top="'top'"
                 :right="'right'"
-                :vertical="'vertical'"
                 v-model="snackbar" > {{ snackbarText }} <v-btn dark flat @click.native="snackbar = false">Close</v-btn>
               </v-snackbar>
   </v-app>
@@ -163,10 +162,11 @@ export default {
   data () {
     return {
       snackbar: false,
-      snackbarColor: 'success',
+      snackbarColor: '',
       snackbarMode: 'vertical',
       snackbarTimeout: 3000,
       snackbarText: '',
+      Newdialog: false,
       dialog: false,
       DeletePrinterDataDialog: false,
       newPrinterData: false,
@@ -197,10 +197,10 @@ export default {
       },
       NewItem: {
         Id: '',
-        KCatId: 0,
-        FoodAreaID: 0,
-        PrntPath: 0,
-        PrntCopy: 0
+        KCatId: '',
+        FoodAreaID: '',
+        PrntPath: '',
+        PrntCopy: ''
       }
     }
   },
@@ -246,6 +246,7 @@ export default {
       axios.DeletePrinterdata(parameter).then(response => {
         if (response.status === 200) {
           this.fetchPrinterList()
+          this.snackbarColor = 'success'
           this.snackbarText = 'Successfully Deleted from server'
           this.snackbar = true
           console.log('Delete response from server', response)
@@ -269,6 +270,7 @@ export default {
       axios.updatePrinterdata(parameter).then(response => {
         if (response.status === 200) {
           this.fetchPrinterList()
+          this.snackbarColor = 'success'
           this.snackbarText = 'Successfully Updated Printer data'
           this.snackbar = true
         }
@@ -284,16 +286,23 @@ export default {
     },
 
     AddNewPrinterData () {
-      const parameter = 'api/PrinterSettings?kcatid=' + this.NewItem.KCatId + '&foodareaid=' + this.NewItem.FoodAreaID + '&printpath=' + this.NewItem.PrntPath + '&printcopy=' + this.NewItem.PrntCopy
-      axios.addPrinterData(parameter).then(response => {
-        if (response.status === 200) {
-          this.fetchPrinterList()
-          this.snackbarText = 'Successfully Added Printer data'
-          this.snackbar = true
-          this.dialog = false
-          console.log('Response from server for adding new data', response)
-        }
-      })
+      if (this.NewItem.KCatId && this.NewItem.FoodAreaID && this.NewItem.PrntPath && this.NewItem.PrntCopy) {
+        const parameter = 'api/PrinterSettings?kcatid=' + this.NewItem.KCatId + '&foodareaid=' + this.NewItem.FoodAreaID + '&printpath=' + this.NewItem.PrntPath + '&printcopy=' + this.NewItem.PrntCopy
+        axios.addPrinterData(parameter).then(response => {
+          if (response.status === 200) {
+            this.fetchPrinterList()
+            this.snackbarColor = 'success'
+            this.snackbarText = 'Successfully Added Printer data'
+            this.snackbar = true
+            this.Newdialog = false
+            console.log('Response from server for adding new data', response)
+          }
+        })
+      } else {
+        this.snackbarColor = 'error'
+        this.snackbarText = 'Please Enter Valid data'
+        this.snackbar = true
+      }
     }
   }
 }

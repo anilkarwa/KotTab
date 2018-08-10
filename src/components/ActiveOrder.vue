@@ -20,7 +20,7 @@
         @input="foodFilter()"
       ></v-text-field>
       <v-spacer></v-spacer>
-      <v-btn flat icon color="white" @click="checkout()">
+      <v-btn flat icon color="white" @click="checkout()" v-if="!activeOrder">
         <v-icon>assignment_turned_in</v-icon>
       </v-btn>
     </v-toolbar>
@@ -122,7 +122,7 @@
                     </template>
                   </v-data-table>
               </v-layout>
-              <v-layout row justify-center>
+              <v-layout row justify-center v-if="activeOrder">
                 <v-btn color="success" dark large @click="sendForPayment">Send for Payment</v-btn>
               </v-layout>
           </v-container>
@@ -251,6 +251,40 @@ export default {
       }
       // console.log('Current Date:', this.getKOTDate())
       console.log('Final Order', JSON.stringify(FinalOrder))
+
+      // Test Code for printer Code ---- Start HERE ------
+      const orderListForPrinter = FinalOrder.ItemsList
+      console.log('Priner Order Data', orderListForPrinter)
+      var KcatIdTable = []
+      var finalOrderList = []
+      orderListForPrinter.forEach(element => {
+        if (KcatIdTable.includes(element.KCATID)) {
+          let key
+          for (let i = 0; i < finalOrderList.length; i++) {
+            if (finalOrderList[i][element.KCATID] !== undefined) {
+              key = i
+            }
+          }
+          finalOrderList[key][element.KCATID].push(element)
+        } else {
+          KcatIdTable.push(element.KCATID)
+          let temp = {
+            [element.KCATID]: [element]
+          }
+          finalOrderList.push(temp)
+        }
+      })
+      finalOrderList.forEach(order => {
+        const payload = {
+          printerAddress: Object.keys(order)[0],
+          printData: order[Object.keys(order)]
+        }
+        axios.printOrders(payload).then(response => {
+          console.log('Response for printing data', response)
+        })
+      })
+      // Test Code for printer Code ---- End HERE ------
+
       axios.addItemToActiveOrder(FinalOrder).then((data) => {
         if (data.status === 200) {
           localStorage.removeItem('Orders')

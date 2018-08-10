@@ -87,9 +87,12 @@
                     </template>
                   </v-data-table>
               </v-layout>
-              <v-layout row justify-center>
+              <!-- <v-layout row justify-center>
+                <v-btn color="success" dark large @click="checkout()">Place the Order</v-btn>
+              </v-layout> -->
+              <!-- <v-layout row justify-center>
                 <v-btn color="success" dark large @click="sendForPayment">Send for Payment</v-btn>
-              </v-layout>
+              </v-layout> -->
           </v-container>
            <v-snackbar
         :timeout="timeout"

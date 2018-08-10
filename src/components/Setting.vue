@@ -11,7 +11,7 @@
           style="min-height: 0;"
           grid-list-lg>
           <v-layout row wrap>
-            <v-flex xs12 @click="menuSelection(1)">
+            <v-flex xs12 @click="menuSelection(1)" style="cursor: pointer">
               <v-card color="blue-grey darken-2" class="white--text">
                 <v-container fluid grid-list-lg>
                   <v-layout row class="text-lg-center">
@@ -27,7 +27,7 @@
                 </v-container>
               </v-card>
             </v-flex>
-            <v-flex xs12 @click="menuSelection(2)">
+            <v-flex xs12 @click="menuSelection(2)" style="cursor: pointer">
               <v-card color="cyan darken-2" class="white--text">
                 <v-container fluid grid-list-lg>
                   <v-layout row class="text-lg-center">
@@ -41,7 +41,7 @@
                 </v-container>
               </v-card>
             </v-flex>
-            <v-flex xs12 @click="menuSelection(3)">
+            <v-flex xs12 @click="menuSelection(3)" style="cursor: pointer">
               <v-card color="purple" class="white--text">
                 <v-container fluid grid-list-lg>
                   <v-layout row class="text-lg-center">
