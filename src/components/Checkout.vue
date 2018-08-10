@@ -68,14 +68,18 @@
                       <td class="text-xs-right">{{ props.item.KOTQuantity }}</td>
                       <td class="text-xs-right">{{ props.item.KOTRate }}</td>
                       <td class="text-xs-right">{{ props.item.KOTAmount }}</td>
-                      <!-- <td class="justify-center layout px-0">
-                        <v-btn icon class="mx-0">
+                      <td class="justify-center layout px-0">
+                        <v-btn icon class="mx-0"
+                        @click="editOrderItem(props.item)"
+                        >
                           <v-icon color="teal">edit</v-icon>
                         </v-btn>
-                        <v-btn icon class="mx-0">
+                        <v-btn icon class="mx-0"
+                        @click="confirmDialog(props.item)"
+                        >
                           <v-icon color="pink">delete</v-icon>
                         </v-btn>
-                      </td> -->
+                      </td>
                     </template>
                     <template slot="no-data">
                       <!-- <v-btn color="primary">Reset</v-btn> -->
@@ -110,6 +114,87 @@
         </v-card>
       </v-flex>
     </v-content>
+    <v-dialog v-model="editItem" max-width="500px">
+          <v-card>
+            <v-card-title>
+              <span class="headline">Edit Item</span>
+            </v-card-title>
+  
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedItem.ItemName" label="Item Name"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 align-end flexbox>
+                  <span style="font-size:25px;margin-right:1%">Quntity:</span>
+                  <v-btn fab dark small color="red" @click="ModifyOrder('remove')"><v-icon dark>remove</v-icon></v-btn>
+                  <span style="font-size:20px;color:red">{{ editedItem.KOTQuantity }}</span>
+                  <v-btn fab dark small color="green" @click="ModifyOrder('add')"><v-icon dark>add</v-icon></v-btn>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedItem.KOTQuantity" label="Quantity"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedItem.KOTRate" label="Rate" disabled></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedItem.KOTAmount" label="Amount" disabled></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field
+                      v-model="editedItem.AdditionalInstructions"
+                      rows="1"
+                      multi-line>
+                      <div slot="label">
+                      Additional Instructions
+                    </div>
+              </v-text-field>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-card-text>
+  
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" flat @click.native="editItem = false">Cancel</v-btn>
+              <v-btn color="blue darken-1" flat @click.native="saveOrderItem">Save</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <!-- Delete Item Dialog Box -->
+        <v-dialog
+        v-model="DeleteItemdialog"
+        max-width="290"
+      >
+        <v-card>
+          <v-card-title class="headline">Are you Sure you wanna Delete this Item ?</v-card-title>
+  
+          <v-card-text>
+            Are you Sure you wanna Delete this Item, If Yes please click on Agree button on the right side
+          </v-card-text>
+  
+          <v-card-actions>
+            <v-spacer></v-spacer>
+  
+            <v-btn
+              color="green darken-1"
+              flat="flat"
+              @click="dialog = false"
+            >
+              Disagree
+            </v-btn>
+  
+            <v-btn
+              color="green darken-1"
+              flat="flat"
+              @click="deleteOrderItem()"
+            >
+              Agree
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
   </v-app>
 </div>
 </template>
@@ -119,6 +204,8 @@ import router from '../router'
 export default {
   data () {
     return {
+      DeleteItemdialog: false,
+      editItem: false,
       drawer: null,
       waiterId: null,
       items: {
@@ -140,8 +227,19 @@ export default {
         },
         { text: 'Quantity', value: 'Quantity' },
         { text: 'Rate', value: 'Rate' },
-        { text: 'Amount', value: 'Amount' }
+        { text: 'Amount', value: 'Amount' },
+        { text: 'Action', value: 'Action' }
       ],
+      editedItem: {
+        AdditionalInstructions: '',
+        ItemId: '',
+        ItemName: '',
+        KCATID: '',
+        KOTAmount: '',
+        KOTQuantity: '',
+        KOTRate: '',
+        SlNo: ''
+      },
       Orderitems: [],
       snackbar: false,
       snackbar2: false,
@@ -153,7 +251,9 @@ export default {
       timeout2: 6000,
       text: 'Please Select the WaiterID',
       snackbar2text: '',
-      snackbar2color: 'success'
+      snackbar2color: 'success',
+      editedIndex: -1,
+      deleteItem: ''
     }
   },
   mounted () {
@@ -187,6 +287,7 @@ export default {
       }
       console.log('Order', Order)
       this.Orderitems = Order
+      console.log('TYPE of', typeof (this.Orderitems))
     },
     checkout () {
       if (this.waiterId) {
@@ -204,37 +305,37 @@ export default {
         console.log('Final Order', FinalOrder)
 
         // Test Code for printer Code ---- Start HERE ------
-        // const orderListForPrinter = FinalOrder.ItemsList
-        // console.log('Priner Order Data', orderListForPrinter)
-        // var KcatIdTable = []
-        // var finalOrderList = []
+        const orderListForPrinter = FinalOrder.ItemsList
+        console.log('Priner Order Data', orderListForPrinter)
+        var KcatIdTable = []
+        var finalOrderList = []
 
-        // orderListForPrinter.forEach(element => {
-        //   if (KcatIdTable.includes(element.KCATID)) {
-        //     let key
-        //     for (let i = 0; i < finalOrderList.length; i++) {
-        //       if (finalOrderList[i][element.KCATID] !== undefined) {
-        //         key = i
-        //       }
-        //     }
-        //     finalOrderList[key][element.KCATID].push(element)
-        //   } else {
-        //     KcatIdTable.push(element.KCATID)
-        //     let temp = {
-        //       [element.KCATID]: [element]
-        //     }
-        //     finalOrderList.push(temp)
-        //   }
-        // })
-        // finalOrderList.forEach(order => {
-        //   const payload = {
-        //     printerAddress: Object.keys(order)[0],
-        //     printData: order[Object.keys(order)]
-        //   }
-        //   axios.printOrders(payload).then(response => {
-        //     console.log('Response for printing data', response)
-        //   })
-        // })
+        orderListForPrinter.forEach(element => {
+          if (KcatIdTable.includes(element.KCATID)) {
+            let key
+            for (let i = 0; i < finalOrderList.length; i++) {
+              if (finalOrderList[i][element.KCATID] !== undefined) {
+                key = i
+              }
+            }
+            finalOrderList[key][element.KCATID].push(element)
+          } else {
+            KcatIdTable.push(element.KCATID)
+            let temp = {
+              [element.KCATID]: [element]
+            }
+            finalOrderList.push(temp)
+          }
+        })
+        finalOrderList.forEach(order => {
+          const payload = {
+            printerAddress: Object.keys(order)[0],
+            printData: order[Object.keys(order)]
+          }
+          axios.printOrders(payload).then(response => {
+            console.log('Response for printing data', response)
+          })
+        })
         // Test Code for printer Code ---- End HERE ------
 
         axios.placeOrder(FinalOrder).then((data) => {
@@ -329,6 +430,53 @@ export default {
           }, 3000)
         }
       })
+    },
+    editOrderItem (item) {
+      console.log('ITEM', item)
+      this.editedIndex = this.Orderitems.indexOf(item)
+      console.log('Edit 1', this.Orderitems.indexOf(item))
+      this.editedItem = Object.assign({}, item)
+      console.log('Edit 2', this.editedItem)
+      this.editItem = true
+    },
+    saveOrderItem () {
+      console.log('coming')
+      if (this.editedIndex > -1) {
+        Object.assign(this.Orderitems[this.editedIndex], this.editedItem)
+      } else {
+        this.Orderitems.push(this.editedItem)
+      }
+      // localStorage.setItem('Orders', [])
+      localStorage.setItem('Orders', JSON.stringify(this.Orderitems))
+      this.editItem = false
+    },
+    deleteOrderItem () {
+      const index = this.Orderitems.indexOf(this.deleteItem)
+      this.Orderitems.splice(index, 1)
+      localStorage.setItem('Orders', JSON.stringify(this.Orderitems))
+      this.DeleteItemdialog = false
+    },
+    confirmDialog (item) {
+      this.deleteItem = item
+      this.DeleteItemdialog = true
+    },
+    ModifyOrder (item) {
+      console.log('Modify Item', item)
+      if (item === 'add') {
+        console.log('Coming in add')
+        this.editedItem.KOTQuantity = parseInt(this.editedItem.KOTQuantity, 10) + 1
+        this.editedItem.KOTAmount = this.editedItem.KOTRate * this.editedItem.KOTQuantity
+      } else {
+        console.log('Coming in remove')
+        if (this.editedItem.KOTQuantity > 1) {
+          this.editedItem.KOTQuantity = this.editedItem.KOTQuantity - 1
+          this.editedItem.KOTAmount = this.editedItem.KOTRate * this.editedItem.KOTQuantity
+        }
+      }
+      if (this.editedIndex > -1) {
+        Object.assign(this.Orderitems[this.editedIndex], this.editedItem)
+      }
+      localStorage.setItem('Orders', JSON.stringify(this.Orderitems))
     }
   }
 }

@@ -123,5 +123,43 @@ class Axios {
       }
     })
   }
+  fetchPrinterList () {
+    const fetchPrinterListUrl = process.env.API_BASE.concat('/api/PrinterSettings')
+    return this.axios.get(fetchPrinterListUrl, {
+      timeout: 50000
+    }).then((Response) => {
+      return Response.data
+    })
+  }
+  updatePrinterdata (payload) {
+    return this.axios.request({
+      method: 'PUT',
+      url: process.env.API_BASE.concat('/').concat(payload),
+      responseType: 'json',
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+  }
+  DeletePrinterdata (payload) {
+    return this.axios.request({
+      method: 'DELETE',
+      url: process.env.API_BASE.concat('/').concat(payload),
+      responseType: 'json',
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+  }
+  addPrinterData (payload) {
+    return this.axios.request({
+      method: 'POST',
+      url: process.env.API_BASE.concat('/').concat(payload),
+      responseType: 'json',
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+  }
 }
 export default new Axios()
