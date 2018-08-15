@@ -37,7 +37,7 @@ export default {
       localStorage.setItem('Orders', [])
       localStorage.setItem('activeOrders', [])
       localStorage.setItem('pointingTable', 'OccupiedTables')
-      router.push({name: 'ActiveOrder', params: {tableNumber: tableNumber, tableName: tableName}})
+      router.push({name: 'FinalScreen', params: {tableNumber: tableNumber, tableName: tableName}})
     },
     displayTitle (name) {
       if (!(name === undefined)) {

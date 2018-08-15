@@ -4,6 +4,9 @@
       <v-toolbar color="cyan" dark>
             <v-toolbar-title>Printer Settings</v-toolbar-title>
             <v-spacer></v-spacer>
+            <v-btn flat icon color="white" @click="home()">
+               <v-icon>home</v-icon>
+             </v-btn>
           <v-dialog v-model="Newdialog" max-width="500px">
           <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn>
           <v-card>
@@ -18,10 +21,28 @@
                     <v-text-field v-model="NewItem.Id" label="ID" disabled></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="NewItem.KCatId" label="KCatId"></v-text-field>
+                    <!-- <v-text-field v-model="NewItem.KCatId" label="KCatId"></v-text-field> -->
+                    <v-select
+                      :items="kcatIdList"
+                      v-model="NewItem.KCatId"
+                      label="Kcat ID"
+                      single-line
+                      item-text="KCATName"
+                      item-value="KCATID"
+                      autocomplete
+                    ></v-select>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="NewItem.FoodAreaID" label="FoodAreaID"></v-text-field>
+                    <!-- <v-text-field v-model="NewItem.FoodAreaID" label="FoodAreaID"></v-text-field> -->
+                    <v-select
+                      :items="FoodAreaId"
+                      v-model="NewItem.FoodAreaID"
+                      label="Food Area Id"
+                      single-line
+                      item-text="FoodAreaName"
+                      item-value="FoodAreaID"
+                      autocomplete
+                    ></v-select>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
                     <v-text-field v-model="NewItem.PrntPath" label="PrntPath"></v-text-field>
@@ -157,6 +178,7 @@
 </div>
 </template>
 <script>
+import router from '../router'
 import axios from './Services/httpClient.js'
 export default {
   data () {
@@ -201,7 +223,9 @@ export default {
         FoodAreaID: '',
         PrntPath: '',
         PrntCopy: ''
-      }
+      },
+      kcatIdList: [],
+      FoodAreaId: []
     }
   },
   computed: {
@@ -212,6 +236,8 @@ export default {
 
   beforeMount: function () {
     // this.fetchPrinterList()
+    this.loadKcatId()
+    this.loadFoodAreaId()
   },
 
   watch: {
@@ -303,6 +329,22 @@ export default {
         this.snackbarText = 'Please Enter Valid data'
         this.snackbar = true
       }
+    },
+
+    loadKcatId () {
+      axios.getKcatId().then(response => {
+        console.log('Kcat ID:', response)
+        this.kcatIdList = response
+      })
+    },
+    loadFoodAreaId () {
+      axios.getFoodAreaId().then(response => {
+        console.log('Food Area ID', response)
+        this.FoodAreaId = response
+      })
+    },
+    home () {
+      router.push({name: 'Setting'})
     }
   }
 }

@@ -10,6 +10,8 @@ import VacantTables from '@/components/VacantTables'
 import ItemDescription from '@/components/ItemDescription'
 import Checkout from '@/components/Checkout'
 import ActiveOrder from '@/components/ActiveOrder'
+import FinalScreen from '@/components/FinalScreen'
+import FinalScreenb from '@/components/FinalScreenBackup'
 
 Vue.use(Router)
 
@@ -65,6 +67,16 @@ const router = new Router({
       path: '/activeorder',
       name: 'ActiveOrder',
       component: ActiveOrder
+    },
+    {
+      path: '/fc',
+      name: 'FinalScreen',
+      component: FinalScreen
+    },
+    {
+      path: '/fcb',
+      name: 'FinalScreenb',
+      component: FinalScreenb
     },
     {
       path: '*',

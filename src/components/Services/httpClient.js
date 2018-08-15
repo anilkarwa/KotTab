@@ -114,8 +114,8 @@ class Axios {
   printOrders (payload) {
     return this.axios.request({
       method: 'POST',
-      // url: process.env.API_BASE.concat('')
-      url: 'http://192.168.31.110/kottab/api/PrintKOT',
+      url: process.env.API_BASE.concat('/api/PrintKOT'),
+      // url: 'http://192.168.31.110/kottab/api/PrintKOT',
       responseType: 'json',
       data: payload,
       headers: {
@@ -159,6 +159,22 @@ class Axios {
       headers: {
         'content-type': 'application/json'
       }
+    })
+  }
+  getKcatId () {
+    const fetchKcatIdUrl = process.env.API_BASE.concat('/api/KOTCATList')
+    return this.axios.get(fetchKcatIdUrl, {
+      timeout: 50000
+    }).then((Response) => {
+      return Response.data
+    })
+  }
+  getFoodAreaId () {
+    const fetchFoodAreaIdUrl = process.env.API_BASE.concat('/api/FoodAreaList')
+    return this.axios.get(fetchFoodAreaIdUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
     })
   }
 }
