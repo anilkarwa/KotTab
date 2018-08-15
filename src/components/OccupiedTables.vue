@@ -37,6 +37,8 @@ export default {
       localStorage.setItem('Orders', [])
       localStorage.setItem('activeOrders', [])
       localStorage.setItem('pointingTable', 'OccupiedTables')
+      localStorage.setItem('TableName', tableName)
+      localStorage.setItem('TableNumber', tableNumber)
       router.push({name: 'FinalScreen', params: {tableNumber: tableNumber, tableName: tableName}})
     },
     displayTitle (name) {

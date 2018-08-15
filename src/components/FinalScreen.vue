@@ -655,10 +655,10 @@ export default {
             finalOrderList.forEach(order => {
               const payload = {
                 printerAddress: Object.keys(order)[0],
-                waiterId: '',
-                tableNumber: '',
+                waiterId: this.waiterId,
+                tableNumber: localStorage.getItem('TableNumber'),
                 kotNumber: '',
-                PAX: '',
+                PAX: this.paxId,
                 printData: order[Object.keys(order)]
               }
               console.log('Payload for printer', payload)
@@ -710,6 +710,10 @@ export default {
       })
       finalOrderList.forEach(order => {
         const payload = {
+          waiterId: this.waiterId,
+          tableNumber: localStorage.getItem('TableNumber'),
+          kotNumber: '',
+          PAX: this.paxId,
           printerAddress: Object.keys(order)[0],
           printData: order[Object.keys(order)]
         }
