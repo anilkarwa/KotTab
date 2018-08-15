@@ -100,6 +100,9 @@
                     </template>
                   </v-data-table>
               </v-layout>
+              <v-flex>
+                      Total Quantity: {{vacantOrderQuantity}} || Total Amount: {{vacantOrderTotalAmount}}
+              </v-flex>
                <div class="text-xs-center">
                   <v-btn round color="success" @click="checkout()" dark v-if="!occupiedTable">Place Kitchen Order</v-btn>
                   <v-btn round color="success" @click="activeOrderCheckout()" dark v-if="occupiedTable">Add Items in Kitchen Order</v-btn>
@@ -349,7 +352,11 @@ export default {
       snackbar: false,
       snackbarText: '',
       deleteItem: '',
-      activeOrderItems: []
+      activeOrderItems: [],
+      vacantOrderQuantity: 0,
+      vacantOrderTotalAmount: 0,
+      occupiedOrderQuantity: 0,
+      occupiedOrderTotalAmount: 0
     }
   },
   beforeMount () {
@@ -461,6 +468,8 @@ export default {
           console.log('Local Store Value', JSON.parse(localStorage.getItem('Orders')))
           this.$parent.Order.push(preOrderItem)
         }
+        this.vacantOrderQuantity = this.$parent.Order.length
+        this.vacantOrderTotalAmount = this.vacantOrderTotalAmount + preOrderItem.KOTAmount
         let orderSl = 1
         if (this.occupiedTable) {
           let activeOrderQuantity = JSON.parse(localStorage.getItem('activeOrders')).length
@@ -472,6 +481,9 @@ export default {
         this.$parent.Order.forEach(data => {
           console.log('Reorder the Order Loop', data.SlNo)
           data.SlNo = orderSl
+          console.log('this.vacantOrderTotalAmount', this.vacantOrderTotalAmount)
+          console.log('data.KOTAmount', data.KOTAmount)
+          console.log('After Adding', this.vacantOrderTotalAmount)
           orderSl++
         })
         localStorage.setItem('Orders', JSON.stringify(this.$parent.Order))
@@ -539,10 +551,12 @@ export default {
     },
     deleteOrderItem () {
       const index = this.Orderitems.indexOf(this.deleteItem)
+      this.vacantOrderTotalAmount = this.vacantOrderTotalAmount - this.Orderitems[index].KOTAmount
       this.Orderitems.splice(index, 1)
       localStorage.setItem('Orders', JSON.stringify(this.Orderitems))
       this.loadOrderItem()
       this.DeleteItemdialog = false
+      this.vacantOrderQuantity = this.Orderitems.length
     },
     saveOrderItem () {
       console.log('coming')
@@ -656,7 +670,7 @@ export default {
               const payload = {
                 printerAddress: Object.keys(order)[0],
                 waiterId: this.waiterId,
-                tableNumber: localStorage.getItem('TableNumber'),
+                tableNumber: localStorage.getItem('TableName'),
                 kotNumber: '',
                 PAX: this.paxId,
                 printData: order[Object.keys(order)]
@@ -711,7 +725,7 @@ export default {
       finalOrderList.forEach(order => {
         const payload = {
           waiterId: this.waiterId,
-          tableNumber: localStorage.getItem('TableNumber'),
+          tableNumber: localStorage.getItem('TableName'),
           kotNumber: '',
           PAX: this.paxId,
           printerAddress: Object.keys(order)[0],
