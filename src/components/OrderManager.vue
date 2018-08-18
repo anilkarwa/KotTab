@@ -88,7 +88,7 @@
                           <v-icon color="teal">edit</v-icon>
                         </v-btn>
                         <v-btn icon class="mx-0"
-                        @click="confirmDialog(props.item)"
+                        @click="deleteOrderItem(props.item)"
                         >
                           <v-icon color="pink">delete</v-icon>
                         </v-btn>
@@ -110,6 +110,50 @@
         </v-flex>
       </v-layout>
     </v-container>
+<!-- Model for Edit Order List Item -->
+    <v-dialog v-model="editItemModel" max-width="500px">
+        <v-card>
+            <v-card-title>
+              <span class="headline">Add Additional Instructions</span>
+            </v-card-title>
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedItem.ItemName" label="Item Name" disabled></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 align-end flexbox>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedItem.KOTQuantity" label="Quantity" disabled></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedItem.KOTRate" label="Rate" disabled></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedItem.KOTAmount" label="Amount" disabled></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm12 md12>
+                    <v-text-field
+                      v-model="editedItem.AdditionalInstructions"
+                      rows="1"
+                      multi-line>
+                      <div slot="label">
+                      Additional Instructions
+                    </div>
+              </v-text-field>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-card-text>
+  
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" flat @click.native="editItemModel = false">Cancel</v-btn>
+              <v-btn color="blue darken-1" flat @click.native="modifyOrderItem">Save</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
     <!-- <v-snackbar
       :timeout="3000"
       :top="'top'"
@@ -168,7 +212,8 @@ export default {
         KOTQuantity: '',
         KOTRate: '',
         SlNo: ''
-      }
+      },
+      editItemModel: false
     }
   },
   beforeMount () {
@@ -340,6 +385,23 @@ export default {
       this.editedItem.KOTRate = item.KOTRate
       this.editedItem.KOTAmount = this.editedItem.KOTQuantity * this.editedItem.KOTRate
       this.editedItem.SlNo = item.SlNo
+      this.editItemModel = true
+    },
+    modifyOrderItem () {
+      if (this.editedIndex > -1) {
+        Object.assign(this.Orderitems[this.editedIndex], this.editedItem)
+      }
+      localStorage.setItem('Orders', JSON.stringify(this.Orderitems))
+      this.editItemModel = false
+    },
+    deleteOrderItem (item) {
+      const index = this.Orderitems.indexOf(item)
+      //   this.vacantOrderTotalAmount = this.vacantOrderTotalAmount - this.Orderitems[index].KOTAmount
+      this.Orderitems.splice(index, 1)
+      localStorage.setItem('Orders', JSON.stringify(this.Orderitems))
+      this.loadOrderItem()
+      //   this.DeleteItemdialog = false
+      //   this.vacantOrderQuantity = this.Orderitems.length
     }
   }
 }
