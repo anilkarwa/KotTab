@@ -392,7 +392,7 @@ export default {
       }
     },
     loadFoodItem () {
-      axios.getFoodItemList().then((data) => {
+      axios.getFoodItemList(2).then((data) => {
         this.foodItem = data
         console.log('Food Item', this.foodItem)
       })
@@ -471,13 +471,13 @@ export default {
         this.vacantOrderQuantity = this.$parent.Order.length
         this.vacantOrderTotalAmount = this.vacantOrderTotalAmount + preOrderItem.KOTAmount
         let orderSl = 1
-        if (this.occupiedTable) {
-          let activeOrderQuantity = JSON.parse(localStorage.getItem('activeOrders')).length
-          if (activeOrderQuantity > 0) {
-            console.log('Current Table Order Item List Length', activeOrderQuantity)
-            orderSl = activeOrderQuantity + 1
-          }
-        }
+        // if (this.occupiedTable) {
+        //   let activeOrderQuantity = JSON.parse(localStorage.getItem('activeOrders')).length
+        //   if (activeOrderQuantity > 0) {
+        //     console.log('Current Table Order Item List Length', activeOrderQuantity)
+        //     orderSl = activeOrderQuantity + 1
+        //   }
+        // }
         this.$parent.Order.forEach(data => {
           console.log('Reorder the Order Loop', data.SlNo)
           data.SlNo = orderSl
@@ -490,10 +490,10 @@ export default {
         console.log('Local Storage', JSON.parse(localStorage.getItem('Orders')))
         self.items.AdditionalInstructions = ''
         this.items.KOTQuantity = 1
-        this.snackbarcolor = 'success'
-        this.snackbarText = 'Successfully Added Into Cart'
-        this.snackbar = true
-        this.dialog = false
+        // this.snackbarcolor = 'success'
+        // this.snackbarText = 'Successfully Added Into Cart'
+        // this.snackbar = true
+        // this.dialog = false
       }
       this.loadOrderItem()
     },

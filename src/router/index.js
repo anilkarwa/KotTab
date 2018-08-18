@@ -12,6 +12,8 @@ import Checkout from '@/components/Checkout'
 import ActiveOrder from '@/components/ActiveOrder'
 import FinalScreen from '@/components/FinalScreen'
 import FinalScreenb from '@/components/FinalScreenBackup'
+import NewHome from '@/components/NewHome'
+import OrderManagement from '@/components/OrderManager'
 
 Vue.use(Router)
 
@@ -77,6 +79,16 @@ const router = new Router({
       path: '/fcb',
       name: 'FinalScreenb',
       component: FinalScreenb
+    },
+    {
+      path: '/nh',
+      name: 'NewHome',
+      component: NewHome
+    },
+    {
+      path: '/om',
+      name: 'OrderManagement',
+      component: OrderManagement
     },
     {
       path: '*',

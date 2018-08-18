@@ -33,18 +33,17 @@ class Axios {
       return Response.data
     })
   }
-  getFoodItemList () {
-    const getFoodItemListUrl = process.env.API_BASE.concat('/api/Items')
+  getFoodItemList (key) {
+    const getFoodItemListUrl = process.env.API_BASE.concat('/api/Items?tableId=').concat(key)
     return this.axios.get(getFoodItemListUrl, {
       timeout: 50000
     }).then((Response) => {
       return Response.data
     })
   }
-  getFilteredItemList (key) {
-    if (key) {
-      const beforeUrl = process.env.API_BASE.concat('/api/Items?term=')
-      const getFilterFoodListUrl = beforeUrl.concat(key)
+  getFilteredItemList (searchkey, tableId) {
+    if (searchkey && tableId) {
+      const getFilterFoodListUrl = process.env.API_BASE.concat('/api/Items?term=').concat(searchkey).concat('&tableId=').concat(tableId)
       return this.axios.get(getFilterFoodListUrl, {
         timeout: 50000
       }).then((Response) => {
@@ -172,6 +171,38 @@ class Axios {
   getFoodAreaId () {
     const fetchFoodAreaIdUrl = process.env.API_BASE.concat('/api/FoodAreaList')
     return this.axios.get(fetchFoodAreaIdUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  fetchPendingPaymentTables () {
+    const fetchPendingPaymentTablesUrl = process.env.API_BASE.concat('/api/PaymentTable')
+    return this.axios.get(fetchPendingPaymentTablesUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  filterVacantTables (key) {
+    const filterVacantTablesUrl = process.env.API_BASE.concat('/api/SearchVacantTable?term=').concat(key)
+    return this.axios.get(filterVacantTablesUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  filterOccupiedTables (key) {
+    const filterOccupiedTablesUrl = process.env.API_BASE.concat('/api/SearchOccupiedTable?term=').concat(key)
+    return this.axios.get(filterOccupiedTablesUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  filterPendingPaymentTables (key) {
+    const filterPendingPaymentTablesUrl = process.env.API_BASE.concat('/api/SearchPaymentTable?term=').concat(key)
+    return this.axios.get(filterPendingPaymentTablesUrl, {
       timeout: 50000
     }).then(response => {
       return response.data
