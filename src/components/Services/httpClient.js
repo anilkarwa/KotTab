@@ -208,5 +208,13 @@ class Axios {
       return response.data
     })
   }
+  cancelActiveOrderQuantity (KOTNO, itemId, quantityNo) {
+    const cancelActiveOrderQuantityUrl = process.env.API_BASE.concat('/api/CancelItemQuantity?KOTNO=').concat(KOTNO).concat('&itemId=').concat(itemId).concat('&quantityNo=').concat(quantityNo)
+    return this.axios.get(cancelActiveOrderQuantityUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
 }
 export default new Axios()

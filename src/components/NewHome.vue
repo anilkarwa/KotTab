@@ -7,7 +7,8 @@
         <v-spacer></v-spacer>
         <v-toolbar-title class="white--text">POSTAB</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-toolbar-title class="white--text">Designed By <a href="http://www.softvent.com/">Softvent.com</a></v-toolbar-title>
+        <!-- <v-toolbar-title class="white--text">Designed By <a href="http://www.softvent.com/">Softvent.com</a></v-toolbar-title> -->
+        <v-toolbar-title class="white--text"><v-btn slot="activator" color="cyan darken-3" dark class="mb-2" v-if="AdminLogin" @click="ShowPrinterSetting">Printer Setting</v-btn><v-btn slot="activator" color="cyan darken-3" dark class="mb-2" @click="logout">Logout</v-btn></v-toolbar-title>
       </v-toolbar>
         <v-container
           fluid
@@ -121,18 +122,25 @@ export default {
       occupiedTableCount: 0,
       pendingPaymentTable: [],
       searchPendingPaymentTable: '',
-      pendingPaymentTableCount: 0
+      pendingPaymentTableCount: 0,
+      AdminLogin: false
     }
   },
   beforeMount: function () {
     this.getVacantTables()
     this.getOccupiedTables()
     this.getPendingPaymentTables()
+    this.adminAuth()
   },
   methods: {
     /**
      * Code for Vacant Tables
      */
+    adminAuth () {
+      if (localStorage.getItem('userType') === 'ADMIN') {
+        this.AdminLogin = true
+      }
+    },
     FilterVacantTable () {
       if (this.searchVacantTable) {
         console.log('Search key for Vacant Table', this.searchVacantTable)
@@ -220,6 +228,13 @@ export default {
       // localStorage.setItem('TableName', tableName)
       // localStorage.setItem('TableNumber', tableNumber)
       // router.push({name: 'FinalScreen', params: {tableNumber: tableNumber, tableName: tableName}})
+    },
+    logout () {
+      localStorage.clear()
+      router.push({name: 'Login'})
+    },
+    ShowPrinterSetting () {
+      router.push({name: 'Printer'})
     }
   }
 }

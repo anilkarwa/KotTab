@@ -236,6 +236,7 @@ export default {
 
   beforeMount: function () {
     // this.fetchPrinterList()
+    this.adminAuth()
     this.loadKcatId()
     this.loadFoodAreaId()
   },
@@ -251,6 +252,12 @@ export default {
   },
 
   methods: {
+    adminAuth () {
+      if (localStorage.getItem('userType') !== 'ADMIN') {
+        console.log('Comin in Admin Auth')
+        router.push({name: 'NewHome'})
+      }
+    },
     editItem (item) {
       console.log('Edit Item', item)
       this.editedItem.Id = item.Id

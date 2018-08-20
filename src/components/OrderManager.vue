@@ -101,11 +101,81 @@
                   </v-data-table>
               </v-layout>
               <v-flex>
-                      <!-- Total Quantity: {{vacantOrderQuantity}} || Total Amount: {{vacantOrderTotalAmount}} -->
+                      Total Quantity: {{vacantOrderQuantity}} || Total Amount: {{vacantOrderTotalAmount}}
               </v-flex>
+                <div class="text-xs-center">
+                  <v-btn round color="success" @click="checkoutOrderInVacantTable()" dark>Place Kitchen Order</v-btn>
+               </div>
             </v-container>
-            <v-container v-else>
-               
+            <v-container v-if="occupiedTable">
+               <v-layout row justify-center style="margin-top:1%">
+                   <v-data-table
+                  :headers="activeOrderHeaders"
+                  :items="activeOrderitems"
+                  hide-actions
+                  class="elevation-1"
+                  >
+                    <template slot="items" slot-scope="props">
+                      <td>{{ props.item.ItemName }}</td>
+                      <td class="text-xs-right">{{ props.item.KOTQuantity }}</td>
+                      <td class="text-xs-right">{{ props.item.KOTRate }}</td>
+                      <!-- <td class="text-xs-right">{{ props.item.KOTAmount }}</td> -->
+                      <td class="justify-center layout px-0">
+                        <v-btn icon class="mx-0" @click="modifyActiveOrder(props.item)">
+                          <v-icon color="teal">edit</v-icon>
+                        </v-btn>
+                        <!-- <v-btn icon class="mx-0">
+                          <v-icon color="pink">delete</v-icon>
+                        </v-btn> -->
+                      </td>
+                    </template>
+                    <template slot="no-data">
+                      <!-- <v-btn color="primary">Reset</v-btn> -->
+                      <p>No Active Order Available for This Table</p>
+                    </template>
+                  </v-data-table>
+               </v-layout>
+               <v-layout row justify-center style="margin-top:1%">
+                 <v-data-table
+                  :headers="headers"
+                  :items="Orderitems"
+                  hide-actions
+                  class="elevation-1"
+                  >
+                    <template slot="items" slot-scope="props">
+                      <td>{{ props.item.ItemName }}</td>
+                      <td class="text-xs-right">
+                          <v-btn fab dark small color="red" @click="removeQuantity(props.item)"><v-icon dark>remove</v-icon></v-btn>
+                          {{ props.item.KOTQuantity }}
+                          <v-btn fab dark small color="green" @click="addQuantity(props.item)"><v-icon dark>add</v-icon></v-btn>
+                      </td>
+                      <td class="text-xs-right">{{ props.item.KOTRate }}</td>
+                      <!-- <td class="text-xs-right">{{ props.item.KOTAmount }}</td> -->
+                      <td class="justify-center layout px-0">
+                        <v-btn icon class="mx-0"
+                        @click="editOrderItem(props.item)"
+                        >
+                          <v-icon color="teal">edit</v-icon>
+                        </v-btn>
+                        <v-btn icon class="mx-0"
+                        @click="deleteOrderItem(props.item)"
+                        >
+                          <v-icon color="pink">delete</v-icon>
+                        </v-btn>
+                      </td>
+                    </template>
+                    <template slot="no-data">
+                      <!-- <v-btn color="primary">Reset</v-btn> -->
+                      <p>No Order Available for This Table</p>
+                    </template>
+                  </v-data-table>
+              </v-layout>
+              <v-flex>
+                      Total Quantity: {{vacantOrderQuantity}} || Total Amount: {{vacantOrderTotalAmount}}
+              </v-flex>
+                <div class="text-xs-center">
+                  <v-btn round color="success" @click="checkoutOrderInVacantTable()" dark>Place Kitchen Order</v-btn>
+               </div>
             </v-container>
         </v-flex>
       </v-layout>
@@ -154,7 +224,58 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-    <!-- <v-snackbar
+    <!-- Model for Edit Active Order List Item -->
+    <v-dialog v-model="editActiveOrderModel" max-width="500px">
+        <v-card>
+            <v-card-title>
+              <span class="headline">Edit/Modify Active Order</span>
+            </v-card-title>
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editActiveOrderItem.ItemName" label="Item Name" disabled></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 align-end flexbox>
+                  </v-flex>
+                  <v-flex xs12 sm12 md12>
+                    <td class="text-xs-right">
+                        <v-btn fab dark small color="red" @click="cancelActiveOrder()"><v-icon dark>remove</v-icon></v-btn>
+                        {{ editActiveOrderItem.KOTQuantity }}
+                        <!-- <v-btn fab dark small color="green" @click="addQuantity(props.item)"><v-icon dark>add</v-icon></v-btn> -->
+                    </td>
+                    <!-- <v-btn fab dark small color="red" @click=""><v-icon dark>remove</v-icon></v-btn> -->
+                    <!-- <v-text-field v-model="editActiveOrderItem.KOTQuantity" label="Quantity" disabled></v-text-field> -->
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editActiveOrderItem.KOTRate" label="Rate" disabled></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editActiveOrderItem.KOTAmount" label="Amount" disabled></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm12 md12>
+                    <v-text-field
+                      v-model="editActiveOrderItem.AdditionalInstructions"
+                      rows="1"
+                      multi-line
+                      disabled>
+                      <div slot="label">
+                      Additional Instructions
+                    </div>
+              </v-text-field>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-card-text>
+  
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" flat @click.native="editActiveOrderModel = false">Cancel</v-btn>
+              <v-btn color="blue darken-1" flat @click.native="updateModifyActiveOrder">Save</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+    <v-snackbar
       :timeout="3000"
       :top="'top'"
       :right="'right'"
@@ -163,7 +284,7 @@
     >
       {{ snackbarText }}
       <v-btn flat color="pink" @click.native="snackbar = false">Close</v-btn>
-    </v-snackbar> -->
+    </v-snackbar>
   </v-app>
 </div>
 </template>
@@ -175,9 +296,10 @@ export default {
     return {
       searchFoodItem: '',
       foodItem: [],
-      vacantTable: true,
+      vacantTable: false,
+      occupiedTable: true,
       paxData: [],
-      paxId: null,
+      paxId: 1,
       waiterData: [],
       waiterId: null,
       headers: [
@@ -189,7 +311,7 @@ export default {
         },
         { text: 'Quantity', value: 'Quantity' },
         { text: 'Rate', value: 'Rate' },
-        { text: 'Amount', value: 'Amount' },
+        // { text: 'Amount', value: 'Amount' },
         { text: 'Action', value: 'Action' }
       ],
       newItem: {
@@ -213,7 +335,37 @@ export default {
         KOTRate: '',
         SlNo: ''
       },
-      editItemModel: false
+      editItemModel: false,
+      vacantOrderQuantity: 0,
+      vacantOrderTotalAmount: 0,
+      snackbar: false,
+      snackbarcolor: '',
+      snackbarText: '',
+      activeOrderHeaders: [
+        {
+          text: 'Item Name',
+          align: 'left',
+          sortable: false,
+          value: 'name'
+        },
+        { text: 'Quantity', value: 'Quantity' },
+        { text: 'Rate', value: 'Rate' },
+        // { text: 'Amount', value: 'Amount' }
+        { text: 'Action', value: 'Action' }
+      ],
+      activeOrderitems: [],
+      editActiveOrderItem: {
+        AdditionalInstructions: '',
+        ItemId: '',
+        ItemName: '',
+        KOTNO: '',
+        KOTAmount: '',
+        KOTQuantity: '',
+        totalCurrentQuantity: '',
+        KOTRate: '',
+        SlNo: ''
+      },
+      editActiveOrderModel: false
     }
   },
   beforeMount () {
@@ -221,6 +373,7 @@ export default {
     this.createPaxId()
     this.getWaiterList()
     this.loadOrderItem()
+    this.fetchActiveOrderList()
   },
   methods: {
     displayTableNumber () {
@@ -284,6 +437,7 @@ export default {
           KCATID: self.newItem.KCATID,
           AdditionalInstructions: self.newItem.AdditionalInstructions
         }
+        console.log('Payload', preOrderItem)
         console.log('Test 1', localStorage.getItem('Orders'))
         if (this.$parent.Order.length === 0) {
           console.log('YOOO')
@@ -294,8 +448,8 @@ export default {
           console.log('Local Store Value', JSON.parse(localStorage.getItem('Orders')))
           this.$parent.Order.push(preOrderItem)
         }
-        // this.vacantOrderQuantity = this.$parent.Order.length
-        // this.vacantOrderTotalAmount = this.vacantOrderTotalAmount + preOrderItem.KOTAmount
+        this.vacantOrderQuantity = this.$parent.Order.length
+        this.vacantOrderTotalAmount = this.vacantOrderTotalAmount + preOrderItem.KOTAmount
         let orderSl = 1
         if (this.occupiedTable) {
           let activeOrderQuantity = JSON.parse(localStorage.getItem('activeOrders')).length
@@ -396,12 +550,142 @@ export default {
     },
     deleteOrderItem (item) {
       const index = this.Orderitems.indexOf(item)
-      //   this.vacantOrderTotalAmount = this.vacantOrderTotalAmount - this.Orderitems[index].KOTAmount
+      this.vacantOrderTotalAmount = this.vacantOrderTotalAmount - this.Orderitems[index].KOTAmount
       this.Orderitems.splice(index, 1)
       localStorage.setItem('Orders', JSON.stringify(this.Orderitems))
       this.loadOrderItem()
       //   this.DeleteItemdialog = false
-      //   this.vacantOrderQuantity = this.Orderitems.length
+      this.vacantOrderQuantity = this.Orderitems.length
+    },
+    getKOTDate () {
+      var today = new Date()
+      var date = today.getDate()
+      var month = today.getMonth() + 1
+      if (month < 10) {
+        month = '0' + month
+      }
+      (date < 10) ? date = '0' + date : date = today.getDate()
+      var year = today.getFullYear()
+      var KOTDat = year + '-' + month + '-' + date
+      return KOTDat
+    },
+    getKOTTime () {
+      var today = new Date()
+      var Hour = today.getHours()
+      if (Hour < 10) {
+        Hour = '0' + Hour
+      }
+      var Min = today.getMinutes()
+      if (Min < 10) {
+        Min = '0' + Min
+      }
+      var Sec = today.getSeconds()
+      if (Sec < 10) {
+        Sec = '0' + Sec
+      }
+      var KOTTime = Hour + ':' + Min + ':' + Sec
+      return KOTTime
+    },
+    checkoutOrderInVacantTable () {
+      /**
+       * if conditon for checking if waiterId is there or not waiter Id is not there it will show the pop-up
+       * else if conditon for checking if PaxId is there or not if waxId is not there it will show the pop-up
+       * else if condition will run all API calls regarding Kitchen Order
+       */
+      if (!this.paxId) {
+        this.snackbarcolor = 'error'
+        this.snackbarText = 'Please Select the PAX Number'
+        this.snackbar = true
+      } else if (!this.waiterId || this.waiterId <= 0) {
+        this.snackbarcolor = 'error'
+        this.snackbarText = 'Please Select the Waiter Id'
+        this.snackbar = true
+      } else if (this.waiterId && this.paxId) {
+        /**
+         * Final Order Body for API
+         */
+        var FinalOrder = {
+          TableId: localStorage.getItem('TableNumber'),
+          WaiterId: this.waiterId,
+          PAX: this.paxId,
+          AddedBy: 'User 1',
+          KOTDate: this.getKOTDate(),
+          TimeOfKOT: this.getKOTTime(),
+          AddedDateTime: this.getKOTDate() + ' ' + this.getKOTTime(),
+          ItemsList: this.Orderitems
+        }
+        console.log('Final Payload Body for order', FinalOrder)
+        /**
+        * Place The Order #send request to server
+        */
+        axios.placeOrder(FinalOrder).then(data => {
+          console.log('Place order response from server', data)
+          if (data.status === 200) {
+            console.log('Getting response from server is 200')
+            localStorage.removeItem('Orders')
+            this.$parent.Order = []
+            this.fetchActiveOrderList()
+            this.loadOrderItem()
+          }
+        })
+      }
+    },
+    fetchActiveOrderList () {
+      axios.fetchActiveOrderList(localStorage.getItem('TableNumber')).then((data) => {
+        console.log('Fetch Active order', data)
+        if (data.ItemsList === null) {
+          console.log('Coming in If Conditon')
+          localStorage.setItem('activeOrders', JSON.stringify([]))
+        } else {
+          console.log('Coming in Else Conditon')
+          localStorage.setItem('activeOrders', JSON.stringify(data.ItemsList))
+        }
+        // localStorage.setItem('WaiterId', data.WaiterId)
+        // localStorage.setItem('KOTNumber', data.KOTNO)
+        // localStorage.setItem('PAX', data.PAX)
+        this.KOTNumber = data.KOTNO
+        this.waiterId = data.WaiterId
+        if (data.PAX === 0) {
+          this.paxId = 1
+        } else {
+          this.paxId = data.PAX
+        }
+        this.activeOrderitems = JSON.parse(localStorage.getItem('activeOrders'))
+        console.log('Active order from localstorage', this.activeOrderitems)
+        console.log('Waiter Id', this.waiterId)
+      })
+    },
+    modifyActiveOrder (item) {
+      console.log('Modify Active order', item)
+      this.editActiveOrderItem.AdditionalInstructions = item.AdditionalInstructions
+      this.editActiveOrderItem.ItemId = item.ItemId
+      this.editActiveOrderItem.ItemName = item.ItemName
+      this.editActiveOrderItem.KOTNO = item.KOTNO
+      this.editActiveOrderItem.KOTAmount = item.KOTAmount
+      this.editActiveOrderItem.KOTQuantity = item.KOTQuantity
+      this.editActiveOrderItem.totalCurrentQuantity = item.KOTQuantity
+      this.editActiveOrderItem.KOTRate = item.KOTRate
+      this.editActiveOrderItem.SlNo = item.SlNo
+      this.editActiveOrderModel = true
+    },
+    cancelActiveOrder () {
+      if (this.editActiveOrderItem.KOTQuantity > 1) {
+        this.editActiveOrderItem.KOTQuantity -= 1
+        this.editActiveOrderItem.KOTAmount = this.editActiveOrderItem.KOTRate * this.editActiveOrderItem.KOTQuantity
+      }
+    },
+    updateModifyActiveOrder () {
+      if (this.editActiveOrderItem.totalCurrentQuantity > this.editActiveOrderItem.KOTQuantity) {
+        let QuantityToRemove = this.editActiveOrderItem.totalCurrentQuantity - this.editActiveOrderItem.KOTQuantity
+        let KotNumber = this.editActiveOrderItem.KOTNO
+        let ItemId = this.editActiveOrderItem.ItemId
+        console.log(QuantityToRemove, KotNumber, ItemId)
+        axios.cancelActiveOrderQuantity(KotNumber, ItemId, QuantityToRemove).then(data => {
+          console.log('Response from server for cancel the Quantity', data)
+          this.fetchActiveOrderList()
+          this.editActiveOrderModel = false
+        })
+      }
     }
   }
 }

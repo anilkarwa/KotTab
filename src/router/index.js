@@ -14,6 +14,7 @@ import FinalScreen from '@/components/FinalScreen'
 import FinalScreenb from '@/components/FinalScreenBackup'
 import NewHome from '@/components/NewHome'
 import OrderManagement from '@/components/OrderManager'
+import FloatingButton from '@/components/FloatingButton'
 
 Vue.use(Router)
 
@@ -89,6 +90,11 @@ const router = new Router({
       path: '/om',
       name: 'OrderManagement',
       component: OrderManagement
+    },
+    {
+      path: '/fb',
+      name: 'FloatingButton',
+      component: FloatingButton
     },
     {
       path: '*',

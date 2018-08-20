@@ -759,6 +759,7 @@ export default {
         this.KOTNumber = localStorage.getItem('KOTNumber')
         this.waiterId = localStorage.getItem('WaiterId')
         this.activeOrderItems = JSON.parse(localStorage.getItem('activeOrders'))
+        console.log('Active order from localstraoge', this.activeOrderItems)
         console.log('Waiter Id', this.waiterId)
       })
     },
