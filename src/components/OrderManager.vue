@@ -559,7 +559,7 @@ export default {
       const self = this
       console.log('TTT', localStorage.getItem('Orders'))
       if (!localStorage.getItem('Orders')) {
-        console.log('Yhai hai bhai vo')
+        console.log('Yhai hai bhai vo', this.$parent.Order)
         localStorage.setItem('Orders', JSON.stringify(this.$parent.Order))
       }
       if (self.newItem.ItemId && self.newItem.SlNo && self.newItem.ItemName && self.newItem.KOTQuantity > 0 && self.newItem.KOTRate > 0 && self.newItem.KOTAmount === self.newItem.KOTQuantity * self.newItem.KOTRate) {
@@ -758,6 +758,10 @@ export default {
         axios.placeOrder(FinalOrder).then(data => {
           console.log('Place order response from server', data)
           if (data.status === 200) {
+            // change table status
+            axios.updateTableStatus(localStorage.getItem('TableNumber')).then((response) => {
+              console.log('Changin table status', response)
+            })
             // send for Print
             axios.printKOT(localStorage.getItem('TableNumber')).then(res => {
               console.log('Printer Response from server', res)
