@@ -80,7 +80,7 @@
                           <v-btn fab dark small color="green" @click="addQuantity(props.item)"><v-icon dark>add</v-icon></v-btn>
                       </td>
                       <td class="text-xs-right">{{ props.item.KOTRate }}</td>
-                      <td class="text-xs-right">{{ props.item.KOTAmount }}</td>
+                      <!-- <td class="text-xs-right">{{ props.item.KOTAmount }}</td> -->
                       <td class="justify-center layout px-0">
                         <v-btn icon class="mx-0"
                         @click="editOrderItem(props.item)"
@@ -137,9 +137,11 @@
                </v-layout>
                <v-layout row>
                  <v-spacer></v-spacer>
-                 <v-btn color="info" @click="transferTableModel = true">Transfer Table</v-btn> 
+                 <v-btn color="info" @click="TransferTableFun()">Transfer Table</v-btn> 
                 <v-spacer></v-spacer>
-               <v-btn color="info" @click="mergeTableModel = true">Merge Tables</v-btn>
+               <v-btn color="info" @click="mergeTableFun()">Merge Tables</v-btn>
+               <v-spacer></v-spacer>
+               <v-btn color="info" @click="rePrintOrder()">Re-Print</v-btn>
                <v-spacer></v-spacer>
                </v-layout>
                <v-layout row justify-center style="margin-top:1%">
@@ -302,7 +304,7 @@
               <v-container grid-list-md>
                 <v-layout wrap>
                   <v-flex xs12 sm12 md12>
-                    <v-select
+                    <!-- <v-select
                       :items="OccupiedTableList"
                       v-model="MerageTables"
                       label="Select Table Name to be Merged"
@@ -312,7 +314,8 @@
                       :rules="[v => !!v || 'Please Table']"
                       autocomplete
                       :search-input.sync="search">
-                    </v-select>
+                    </v-select> -->
+                    <h2> Current Table: <span style="color:red">{{ mergeTablesName }}</span> </h2>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
                                         <v-select
@@ -348,7 +351,7 @@
               <v-container grid-list-md>
                 <v-layout wrap>
                   <v-flex xs12 sm12 md12>
-                    <v-select
+                    <!-- <v-select
                       :items="vacantTables"
                       v-model="transferTables"
                       label="Select Table Name to be Transfer (From)"
@@ -358,7 +361,8 @@
                       :rules="[v => !!v || 'Please Table']"
                       autocomplete
                       :search-input.sync="transferSearch">
-                    </v-select>
+                    </v-select> -->
+                   <h2> Current Table: <span style="color:red">{{ transferTablesName }}</span> </h2>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
                                         <v-select
@@ -469,6 +473,7 @@ export default {
       OccupiedTableList: [],
       OccupiedTableLists: [],
       MerageTables: '',
+      mergeTablesName: '',
       MerageTabless: '',
       search: null,
       searchh: null,
@@ -476,6 +481,7 @@ export default {
       vacantTabless: [],
       transferTableModel: false,
       transferTables: '',
+      transferTablesName: '',
       transferTabless: '',
       transferSearch: null,
       transferSearchh: null
@@ -583,12 +589,14 @@ export default {
         } else {
           console.log('ELSEEE')
           console.log('Local Store Value', JSON.parse(localStorage.getItem('Orders')))
+          this.$parent.Order = JSON.parse(localStorage.getItem('Orders'))
           this.$parent.Order.push(preOrderItem)
         }
         this.vacantOrderQuantity = this.$parent.Order.length
         this.vacantOrderTotalAmount = this.vacantOrderTotalAmount + preOrderItem.KOTAmount
         let orderSl = 1
         if (this.occupiedTable) {
+          console.log('COming in if bcz its occupied table')
           let activeOrderQuantity = JSON.parse(localStorage.getItem('activeOrders')).length
           if (activeOrderQuantity > 0) {
             console.log('Current Table Order Item List Length', activeOrderQuantity)
@@ -605,11 +613,17 @@ export default {
         })
         localStorage.setItem('Orders', JSON.stringify(this.$parent.Order))
         console.log('Local Storage', JSON.parse(localStorage.getItem('Orders')))
-        self.newItem.AdditionalInstructions = ''
         this.newItem.KOTQuantity = 1
-        // this.snackbarcolor = 'success'
-        // this.snackbarText = 'Successfully Added Into Cart'
-        // this.snackbar = true
+        this.newItem.ItemId = 0
+        this.newItem.SlNo = 1
+        this.newItem.ItemName = ''
+        this.newItem.KOTRate = 1
+        this.newItem.KOTAmount = 1
+        this.newItem.KCATID = 0
+        this.newItem.AdditionalInstructions = ''
+        this.snackbarcolor = 'success'
+        this.snackbarText = 'Successfully Added Into Cart'
+        this.snackbar = true
         // this.dialog = false
       }
       this.loadOrderItem()
@@ -638,6 +652,7 @@ export default {
       console.log('After Rate', this.editedItem.KOTRate)
       this.editedItem.KOTAmount = this.editedItem.KOTQuantity * this.editedItem.KOTRate
       this.editedItem.SlNo = item.SlNo
+      this.vacantOrderTotalAmount += item.KOTRate
       if (this.editedIndex > -1) {
         Object.assign(this.Orderitems[this.editedIndex], this.editedItem)
       }
@@ -659,6 +674,7 @@ export default {
         console.log('After Rate', this.editedItem.KOTRate)
         this.editedItem.KOTAmount = this.editedItem.KOTQuantity * this.editedItem.KOTRate
         this.editedItem.SlNo = item.SlNo
+        this.vacantOrderTotalAmount -= item.KOTRate
         if (this.editedIndex > -1) {
           Object.assign(this.Orderitems[this.editedIndex], this.editedItem)
         }
@@ -814,7 +830,7 @@ export default {
       this.editActiveOrderModel = true
     },
     cancelActiveOrder () {
-      if (this.editActiveOrderItem.KOTQuantity > 1) {
+      if (this.editActiveOrderItem.KOTQuantity > 0) {
         this.editActiveOrderItem.KOTQuantity -= 1
         this.editActiveOrderItem.KOTAmount = this.editActiveOrderItem.KOTRate * this.editActiveOrderItem.KOTQuantity
       }
@@ -880,6 +896,23 @@ export default {
         console.log('Shift Table Response from server', data)
         this.transferTableModel = false
         router.push({name: 'NewHome'})
+      })
+    },
+    TransferTableFun () {
+      this.transferTables = localStorage.getItem('TableNumber')
+      this.transferTablesName = localStorage.getItem('TableName')
+      console.log('Trafer table', this.transferTables)
+      this.transferTableModel = true
+    },
+    mergeTableFun () {
+      this.MerageTables = localStorage.getItem('TableNumber')
+      this.mergeTablesName = localStorage.getItem('TableName')
+      this.mergeTableModel = true
+    },
+    rePrintOrder () {
+      var TblNumber = localStorage.getItem('TableNumber')
+      axios.rePrintKOT(TblNumber).then(res => {
+        console.log('Reprint Response from server')
       })
     }
   }

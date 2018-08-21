@@ -145,10 +145,28 @@
                     <v-text-field v-model="editedItem.Id" label="ID" disabled></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.KCatId" label="KCatId"></v-text-field>
+                    <v-select
+                      :items="kcatIdList"
+                      v-model="editedItem.KCatId"
+                      label="Kcat ID"
+                      single-line
+                      item-text="KCATName"
+                      item-value="KCATID"
+                      autocomplete
+                    ></v-select>
+                    <!-- <v-text-field v-model="editedItem.KCatId" label="KCatId"></v-text-field> -->
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.FoodAreaID" label="FoodAreaID"></v-text-field>
+                    <v-select
+                      :items="FoodAreaId"
+                      v-model="editedItem.FoodAreaID"
+                      label="Food Area Id"
+                      single-line
+                      item-text="FoodAreaName"
+                      item-value="FoodAreaID"
+                      autocomplete
+                    ></v-select>
+                    <!-- <v-text-field v-model="editedItem.FoodAreaID" label="FoodAreaID"></v-text-field> -->
                   </v-flex>
                   <v-flex xs12 sm6 md4>
                     <v-text-field v-model="editedItem.PrntPath" label="PrntPath"></v-text-field>
