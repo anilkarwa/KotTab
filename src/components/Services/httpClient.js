@@ -216,5 +216,13 @@ class Axios {
       return response.data
     })
   }
+  merageTables (oldTableId, newTableId) {
+    const merageTableUrl = process.env.API_BASE.concat('/api/ShiftToNewTable?oldTableId=').concat(oldTableId).concat('&newTableId=').concat(newTableId).concat('&shifType=merge')
+    return this.axios.get(merageTableUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
 }
 export default new Axios()

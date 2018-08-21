@@ -80,7 +80,7 @@ export default {
           if (!(response.length === 0)) {
             localStorage.setItem('UserID', response[0].UserID)
             localStorage.setItem('userType', response[0].userType)
-            router.push({name: 'Setting', params: {resource: 'Test'}})
+            router.push({name: 'NewHome', params: {resource: 'Test'}})
           } else {
             console.log('Invalid Username password')
             this.snackbarText = 'Invalid Credentials'

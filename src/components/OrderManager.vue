@@ -135,6 +135,13 @@
                     </template>
                   </v-data-table>
                </v-layout>
+               <v-layout row>
+                 <v-spacer></v-spacer>
+                 <v-btn color="info">Transfer Table</v-btn> 
+                <v-spacer></v-spacer>
+               <v-btn color="info">Merge Tables</v-btn>
+               <v-spacer></v-spacer>
+               </v-layout>
                <v-layout row justify-center style="margin-top:1%">
                  <v-data-table
                   :headers="headers"
@@ -285,6 +292,52 @@
       {{ snackbarText }}
       <v-btn flat color="pink" @click.native="snackbar = false">Close</v-btn>
     </v-snackbar>
+    <!-- Model for Merge Table -->
+     <v-dialog v-model="mergeTableModel" max-width="500px">
+        <v-card>
+            <v-card-title>
+              <span class="headline">Merge Tables</span>
+            </v-card-title>
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs12 sm12 md12>
+                    <v-select
+                      :items="OccupiedTableList"
+                      v-model="MerageTables"
+                      label="Select Table Name to be Merged"
+                      required
+                      item-text="TBLName"
+                      item-value="TBLID"
+                      :rules="[v => !!v || 'Please Table']"
+                      autocomplete
+                      :search-input.sync="search">
+                    </v-select>
+                  </v-flex>
+                  <v-flex xs12 sm12 md12>
+                                        <v-select
+                      :items="OccupiedTableLists"
+                      v-model="MerageTabless"
+                      label="Select Table Name to be Merged"
+                      required
+                      item-text="TBLName"
+                      item-value="TBLID"
+                      :rules="[v => !!v || 'Please Table']"
+                      autocomplete
+                      :search-input.sync="searchh">
+                    </v-select>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-card-text>
+  
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" flat @click.native="mergeTableModel = false">Cancel</v-btn>
+              <v-btn color="blue darken-1" flat @click.native="MergeTwoTables()">Merge</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
   </v-app>
 </div>
 </template>
@@ -365,7 +418,22 @@ export default {
         KOTRate: '',
         SlNo: ''
       },
-      editActiveOrderModel: false
+      editActiveOrderModel: false,
+      mergeTableModel: true,
+      OccupiedTableList: [],
+      OccupiedTableLists: [],
+      MerageTables: '',
+      MerageTabless: '',
+      search: null,
+      searchh: null
+    }
+  },
+  watch: {
+    search (val) {
+      val && val !== this.MerageTables && this.SearchOccupiedTable(val)
+    },
+    searchh (vall) {
+      vall && vall !== this.MerageTabless && this.SearchOccupiedTables(vall)
     }
   },
   beforeMount () {
@@ -684,6 +752,30 @@ export default {
           console.log('Response from server for cancel the Quantity', data)
           this.fetchActiveOrderList()
           this.editActiveOrderModel = false
+        })
+      }
+    },
+    SearchOccupiedTable (val) {
+      console.log('Calling Search Occupied Tables', val)
+      axios.filterVacantTables(val).then(data => {
+        console.log('Response from server', data)
+        this.OccupiedTableList = data
+        console.log('Table Id', this.MerageTables)
+      })
+    },
+    SearchOccupiedTables (vall) {
+      console.log('Calling Search Occupied Tables', vall)
+      axios.filterVacantTables(vall).then(data => {
+        console.log('Response from server', data)
+        this.OccupiedTableLists = data
+        console.log('Table Id', this.MerageTabless)
+      })
+    },
+    MergeTwoTables () {
+      if (this.MerageTables && this.MerageTabless) {
+        axios.merageTables(this.MerageTables, this.MerageTabless).then(data => {
+          console.log('Merge response from server', data)
+          this.mergeTableModel = false
         })
       }
     }
