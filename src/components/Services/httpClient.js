@@ -224,5 +224,45 @@ class Axios {
       return response.data
     })
   }
+  fetchTableCount () {
+    const fetchTableCountUrl = process.env.API_BASE.concat('/api/TableCount')
+    return this.axios.get(fetchTableCountUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  transferTable (oldTableId, newTableId) {
+    const transferTableUrl = process.env.API_BASE.concat('/api/ShiftToNewTable?oldTableId=').concat(oldTableId).concat('&newTableId=').concat(newTableId).concat('&shifType=shift')
+    return this.axios.get(transferTableUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  printKOT (tableId) {
+    const printKOTURL = process.env.API_BASE.concat('api/PrintKOT?tableId=').concat(tableId).concat('&print=Y&reprint=N&cancelled=N')
+    return this.axios.get(printKOTURL, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  rePrintKOT (tableId) {
+    const rePrintKOTURL = process.env.API_BASE.concat('api/PrintKOT?tableId=').concat(tableId).concat('&print=N&reprint=Y&cancelled=N')
+    return this.axios.get(rePrintKOTURL, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  cancelPrintKOT (tableId) {
+    const cancelPrintKOTURL = process.env.API_BASE.concat('api/PrintKOT?tableId=').concat(tableId).concat('&print=N&reprint=N&cancelled=Y')
+    return this.axios.get(cancelPrintKOTURL, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
 }
 export default new Axios()

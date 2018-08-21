@@ -351,7 +351,7 @@ export default {
       })
     },
     home () {
-      router.push({name: 'Setting'})
+      router.push({name: 'NewHome'})
     }
   }
 }

@@ -131,6 +131,7 @@ export default {
     this.getOccupiedTables()
     this.getPendingPaymentTables()
     this.adminAuth()
+    this.getTableCount()
   },
   methods: {
     /**
@@ -140,6 +141,14 @@ export default {
       if (localStorage.getItem('userType') === 'ADMIN') {
         this.AdminLogin = true
       }
+    },
+    getTableCount () {
+      axios.fetchTableCount().then(data => {
+        console.log('table Count from server', data)
+        this.vacantTableCount = data.vacantTable
+        this.occupiedTableCount = data.occupiedTable
+        this.pendingPaymentTableCount = data.paymentTable
+      })
     },
     FilterVacantTable () {
       if (this.searchVacantTable) {

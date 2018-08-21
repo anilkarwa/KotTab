@@ -137,9 +137,9 @@
                </v-layout>
                <v-layout row>
                  <v-spacer></v-spacer>
-                 <v-btn color="info">Transfer Table</v-btn> 
+                 <v-btn color="info" @click="transferTableModel = true">Transfer Table</v-btn> 
                 <v-spacer></v-spacer>
-               <v-btn color="info">Merge Tables</v-btn>
+               <v-btn color="info" @click="mergeTableModel = true">Merge Tables</v-btn>
                <v-spacer></v-spacer>
                </v-layout>
                <v-layout row justify-center style="margin-top:1%">
@@ -338,11 +338,57 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+        <!-- Model for Trasfer Table -->
+     <v-dialog v-model="transferTableModel" max-width="500px">
+        <v-card>
+            <v-card-title>
+              <span class="headline">Transfer Table</span>
+            </v-card-title>
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs12 sm12 md12>
+                    <v-select
+                      :items="vacantTables"
+                      v-model="transferTables"
+                      label="Select Table Name to be Transfer (From)"
+                      required
+                      item-text="TBLName"
+                      item-value="TBLID"
+                      :rules="[v => !!v || 'Please Table']"
+                      autocomplete
+                      :search-input.sync="transferSearch">
+                    </v-select>
+                  </v-flex>
+                  <v-flex xs12 sm12 md12>
+                                        <v-select
+                      :items="vacantTabless"
+                      v-model="transferTabless"
+                      label="Select Table Name to be Transfer (To)"
+                      required
+                      item-text="TBLName"
+                      item-value="TBLID"
+                      :rules="[v => !!v || 'Please Table']"
+                      autocomplete
+                      :search-input.sync="transferSearchh">
+                    </v-select>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-card-text>
+  
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" flat @click.native="transferTableModel = false">Cancel</v-btn>
+              <v-btn color="blue darken-1" flat @click.native="transferTable()">Transfer</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
   </v-app>
 </div>
 </template>
 <script>
-// import router from '../router'
+import router from '../router'
 import axios from './Services/httpClient.js'
 export default {
   data () {
@@ -350,7 +396,7 @@ export default {
       searchFoodItem: '',
       foodItem: [],
       vacantTable: false,
-      occupiedTable: true,
+      occupiedTable: false,
       paxData: [],
       paxId: 1,
       waiterData: [],
@@ -419,13 +465,20 @@ export default {
         SlNo: ''
       },
       editActiveOrderModel: false,
-      mergeTableModel: true,
+      mergeTableModel: false,
       OccupiedTableList: [],
       OccupiedTableLists: [],
       MerageTables: '',
       MerageTabless: '',
       search: null,
-      searchh: null
+      searchh: null,
+      vacantTables: [],
+      vacantTabless: [],
+      transferTableModel: false,
+      transferTables: '',
+      transferTabless: '',
+      transferSearch: null,
+      transferSearchh: null
     }
   },
   watch: {
@@ -434,16 +487,32 @@ export default {
     },
     searchh (vall) {
       vall && vall !== this.MerageTabless && this.SearchOccupiedTables(vall)
+    },
+    transferSearch (val) {
+      val && val !== this.transferTables && this.SearchVacantTable(val)
+    },
+    transferSearchh (vall) {
+      vall && vall !== this.transferTabless && this.SearchVacantTables(vall)
     }
   },
   beforeMount () {
+    this.renderTableTypeView()
     this.loadFoodItem()
     this.createPaxId()
     this.getWaiterList()
     this.loadOrderItem()
-    this.fetchActiveOrderList()
+    if (localStorage.getItem('TableType') === 'OccupiedTables') {
+      this.fetchActiveOrderList()
+    }
   },
   methods: {
+    renderTableTypeView () {
+      if (localStorage.getItem('TableType') === 'VacantTables') {
+        this.vacantTable = true
+      } else if (localStorage.getItem('TableType') === 'OccupiedTables') {
+        this.occupiedTable = true
+      }
+    },
     displayTableNumber () {
       return localStorage.getItem('TableName')
     },
@@ -689,6 +758,10 @@ export default {
         axios.placeOrder(FinalOrder).then(data => {
           console.log('Place order response from server', data)
           if (data.status === 200) {
+            // send for Print
+            axios.printKOT(localStorage.getItem('TableNumber')).then(res => {
+              console.log('Printer Response from server', res)
+            })
             console.log('Getting response from server is 200')
             localStorage.removeItem('Orders')
             this.$parent.Order = []
@@ -757,7 +830,7 @@ export default {
     },
     SearchOccupiedTable (val) {
       console.log('Calling Search Occupied Tables', val)
-      axios.filterVacantTables(val).then(data => {
+      axios.filterOccupiedTables(val).then(data => {
         console.log('Response from server', data)
         this.OccupiedTableList = data
         console.log('Table Id', this.MerageTables)
@@ -765,7 +838,7 @@ export default {
     },
     SearchOccupiedTables (vall) {
       console.log('Calling Search Occupied Tables', vall)
-      axios.filterVacantTables(vall).then(data => {
+      axios.filterOccupiedTables(vall).then(data => {
         console.log('Response from server', data)
         this.OccupiedTableLists = data
         console.log('Table Id', this.MerageTabless)
@@ -776,8 +849,34 @@ export default {
         axios.merageTables(this.MerageTables, this.MerageTabless).then(data => {
           console.log('Merge response from server', data)
           this.mergeTableModel = false
+          router.push({name: 'NewHome'})
         })
       }
+    },
+    SearchVacantTable (val) {
+      console.log('Calling Search Occupied Tables', val)
+      axios.filterOccupiedTables(val).then(data => {
+        console.log('Response from server', data)
+        this.vacantTables = data
+        console.log('Table Id', this.vacantTables)
+      })
+    },
+    SearchVacantTables (vall) {
+      console.log('Calling Search Vacant Tables', vall)
+      axios.filterVacantTables(vall).then(data => {
+        console.log('Response from server', data)
+        this.vacantTabless = data
+        console.log('Table Id', this.vacantTabless)
+      })
+    },
+    transferTable () {
+      console.log('Old Table', this.transferTables)
+      console.log('New Table', this.transferTabless)
+      axios.transferTable(this.transferTables, this.transferTabless).then(data => {
+        console.log('Shift Table Response from server', data)
+        this.transferTableModel = false
+        router.push({name: 'NewHome'})
+      })
     }
   }
 }
