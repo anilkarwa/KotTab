@@ -2,12 +2,16 @@
 <div id="login">
   <v-app id="inspire">
     <v-content>
-      <v-container style="background-color:  #f5b041 " fluid fill-height>
+      <v-container fluid fill-height class="background-design">
         <v-layout  align-center justify-center>
           <v-flex xs12 sm8 md4>
             <v-card class="elevation-12">
               <v-toolbar dark color="primary">
-                <v-toolbar-title>Login form</v-toolbar-title>
+                <v-flex xs12 sm12 md12 text-lg-center style="margin-top:3%">
+                  <v-toolbar-title>
+                    <img src="http://softvent.com/images/logo.png" alt="Softvent Logo">
+                  </v-toolbar-title>
+                </v-flex>
                 <v-spacer></v-spacer>
               </v-toolbar>
               <v-card-text>
@@ -100,4 +104,11 @@ export default {
 }
 </script>
 <style>
+.background-design {
+  background-image: url("http://www.chezceleste.fr/images/demo/slides/slide-image-03.jpg/"); /* The image used */
+  background-color: #cccccc; /* Used if the image is unavailable */
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: cover; /* Resize the background image to cover the entire  */
+}
 </style>

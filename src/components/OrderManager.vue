@@ -563,6 +563,7 @@ export default {
     },
     addItemIncart () {
       const self = this
+      let repeatOrder = false
       console.log('TTT', localStorage.getItem('Orders'))
       if (!localStorage.getItem('Orders')) {
         console.log('Yhai hai bhai vo', this.$parent.Order)
@@ -582,14 +583,23 @@ export default {
         }
         console.log('Payload', preOrderItem)
         console.log('Test 1', localStorage.getItem('Orders'))
+        this.$parent.Order = JSON.parse(localStorage.getItem('Orders'))
+        this.$parent.Order.forEach(data => {
+          console.log('Data In Loop---**', data)
+          if (data.ItemId === preOrderItem.ItemId) {
+            console.log('Repeating the order', data)
+            data.KOTQuantity += 1
+            repeatOrder = true
+          }
+        })
         if (this.$parent.Order.length === 0) {
           console.log('YOOO')
-          this.$parent.Order = JSON.parse(localStorage.getItem('Orders'))
+          // this.$parent.Order = JSON.parse(localStorage.getItem('Orders'))
           this.$parent.Order.push(preOrderItem)
-        } else {
+        } else if (!repeatOrder) {
           console.log('ELSEEE')
           console.log('Local Store Value', JSON.parse(localStorage.getItem('Orders')))
-          this.$parent.Order = JSON.parse(localStorage.getItem('Orders'))
+          // this.$parent.Order = JSON.parse(localStorage.getItem('Orders'))
           this.$parent.Order.push(preOrderItem)
         }
         this.vacantOrderQuantity = this.$parent.Order.length
