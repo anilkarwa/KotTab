@@ -241,7 +241,7 @@ class Axios {
     })
   }
   printKOT (tableId) {
-    const printKOTURL = process.env.API_BASE.concat('api/PrintKOT?tableId=').concat(tableId).concat('&print=Y&reprint=N&cancelled=N')
+    const printKOTURL = process.env.API_BASE.concat('/api/PrintKOT?tableId=').concat(tableId).concat('&print=Y&reprint=N&cancelled=N')
     return this.axios.get(printKOTURL, {
       timeout: 50000
     }).then(response => {
@@ -249,7 +249,7 @@ class Axios {
     })
   }
   rePrintKOT (tableId) {
-    const rePrintKOTURL = process.env.API_BASE.concat('api/PrintKOT?tableId=').concat(tableId).concat('&print=N&reprint=Y&cancelled=N')
+    const rePrintKOTURL = process.env.API_BASE.concat('/api/PrintKOT?tableId=').concat(tableId).concat('&print=N&reprint=Y&cancelled=N')
     return this.axios.get(rePrintKOTURL, {
       timeout: 50000
     }).then(response => {
@@ -257,7 +257,7 @@ class Axios {
     })
   }
   cancelPrintKOT (tableId) {
-    const cancelPrintKOTURL = process.env.API_BASE.concat('api/PrintKOT?tableId=').concat(tableId).concat('&print=N&reprint=N&cancelled=Y')
+    const cancelPrintKOTURL = process.env.API_BASE.concat('/api/PrintKOT?tableId=').concat(tableId).concat('&print=N&reprint=N&cancelled=Y')
     return this.axios.get(cancelPrintKOTURL, {
       timeout: 50000
     }).then(response => {

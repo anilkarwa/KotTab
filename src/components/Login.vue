@@ -41,6 +41,11 @@
         </v-layout>
       </v-container>
     </v-content>
+    <v-footer class="pa-3">
+      <v-spacer></v-spacer>
+      <div>Designed and Develop by <a href="http://www.softvent.com/">Softvent</a> &copy; {{ new Date().getFullYear() }}</div>
+      <v-spacer></v-spacer>
+    </v-footer>
   </v-app>
 </div>
 </template>

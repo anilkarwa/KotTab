@@ -175,6 +175,7 @@ export default {
       localStorage.setItem('pointingTable', 'VacantTables')
       localStorage.setItem('TableName', tableName)
       localStorage.setItem('TableNumber', tableNumber)
+      this.$parent.Order = []
       router.push({name: 'OrderManagement'})
     },
     /**
@@ -205,6 +206,7 @@ export default {
       localStorage.setItem('pointingTable', 'OccupiedTables')
       localStorage.setItem('TableName', tableName)
       localStorage.setItem('TableNumber', tableNumber)
+      this.$parent.Order = []
       router.push({name: 'OrderManagement'})
     },
     /**

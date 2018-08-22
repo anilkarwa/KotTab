@@ -709,6 +709,9 @@ export default {
       this.loadOrderItem()
       //   this.DeleteItemdialog = false
       this.vacantOrderQuantity = this.Orderitems.length
+      this.snackbarcolor = 'success'
+      this.snackbarText = 'Deleted Successfully'
+      this.snackbar = true
     },
     getKOTDate () {
       var today = new Date()
@@ -781,12 +784,21 @@ export default {
             // send for Print
             axios.printKOT(localStorage.getItem('TableNumber')).then(res => {
               console.log('Printer Response from server', res)
+              this.snackbarcolor = 'success'
+              this.snackbarText = 'Order Printing...'
+              this.snackbar = true
             })
             console.log('Getting response from server is 200')
             localStorage.removeItem('Orders')
             this.$parent.Order = []
             this.fetchActiveOrderList()
             this.loadOrderItem()
+            this.snackbarcolor = 'success'
+            this.snackbarText = 'Order placed successfully'
+            this.snackbar = true
+            setTimeout(function () {
+              router.push({name: 'NewHome'})
+            }, 3000)
           }
         })
       }
@@ -869,7 +881,12 @@ export default {
         axios.merageTables(this.MerageTables, this.MerageTabless).then(data => {
           console.log('Merge response from server', data)
           this.mergeTableModel = false
-          router.push({name: 'NewHome'})
+          this.snackbarcolor = 'success'
+          this.snackbarText = 'Tables merged Successfully'
+          this.snackbar = true
+          setTimeout(function () {
+            router.push({name: 'NewHome'})
+          }, 3000)
         })
       }
     },
@@ -895,7 +912,12 @@ export default {
       axios.transferTable(this.transferTables, this.transferTabless).then(data => {
         console.log('Shift Table Response from server', data)
         this.transferTableModel = false
-        router.push({name: 'NewHome'})
+        this.snackbarcolor = 'success'
+        this.snackbarText = 'Table transfered Successfully'
+        this.snackbar = true
+        setTimeout(function () {
+          router.push({name: 'NewHome'})
+        }, 3000)
       })
     },
     TransferTableFun () {
@@ -912,6 +934,9 @@ export default {
     rePrintOrder () {
       var TblNumber = localStorage.getItem('TableNumber')
       axios.rePrintKOT(TblNumber).then(res => {
+        this.snackbarcolor = 'success'
+        this.snackbarText = 'Re-printing the order....'
+        this.snackbar = true
         console.log('Reprint Response from server')
       })
     }
