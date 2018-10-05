@@ -7,6 +7,7 @@
             <v-btn flat icon color="white" @click="home()">
                <v-icon>home</v-icon>
             </v-btn>
+            <v-btn color="primary" @click="checkValidation">Check Validation</v-btn>
             <v-btn color="primary" @click="printFormatdialog = true">Print Format Setting</v-btn>
           <v-dialog v-model="Newdialog" max-width="500px">
           <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn>
@@ -236,6 +237,30 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+          <!-- Dialog box for Showing Missing Printer data list -->
+    <v-dialog
+        v-model="MissingPrinterDataDialog"
+        max-width="290"
+      >
+        <v-card>
+          <v-card-title class="headline">These Categories are missing in the list!</v-card-title>
+  
+          <v-card-text>
+            Category Name: <span style="color:red">{{ MissingCategoriesLists }}</span>.
+          </v-card-text>
+  
+          <v-card-actions>
+            <v-spacer></v-spacer>  
+            <v-btn
+              color="green darken-1"
+              flat="flat"
+              @click="MissingPrinterDataDialog = false"
+            >
+              Okay
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
               <v-snackbar
                 :timeout="snackbarTimeout"
                 :color="snackbarColor"
@@ -296,6 +321,7 @@ export default {
       kcatIdList: [],
       FoodAreaId: [],
       printFormatdialog: false,
+      MissingPrinterDataDialog: false,
       cancelledPrint: '',
       companyName: '',
       lineBreakOnBottom: 0,
@@ -313,7 +339,8 @@ export default {
           value: 'N'
         }
       ],
-      confirmKCatName: ''
+      confirmKCatName: '',
+      MissingCategoriesLists: ''
     }
   },
   computed: {
@@ -471,6 +498,20 @@ export default {
       })
       console.log('Payload', payload)
       this.printFormatdialog = false
+    },
+    checkValidation () {
+      axios.checkAllPrinterStatus().then(data => {
+        // console.log('checkValidation', data)
+        if (data) {
+          console.log('Something needs to add here!', data)
+          this.MissingCategoriesLists = data
+          this.MissingPrinterDataDialog = true
+        } else {
+          this.snackbarColor = 'success'
+          this.snackbarText = 'Everything is good to Go!'
+          this.snackbar = true
+        }
+      })
     }
   }
 }

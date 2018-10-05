@@ -417,6 +417,30 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+  <!-- Dialog box for Showing Missing Printer data list -->
+    <v-dialog
+        v-model="MissingPrinterDataDialog"
+        max-width="290"
+      >
+        <v-card>
+          <v-card-title class="headline">These Categories are missing in the list!</v-card-title>
+  
+          <v-card-text>
+            Category Name: <span style="color:red">{{ MissingCategoriesLists }}</span>.
+          </v-card-text>
+  
+          <v-card-actions>
+            <v-spacer></v-spacer>  
+            <v-btn
+              color="green darken-1"
+              flat="flat"
+              @click="MissingPrinterDataDialog = false"
+            >
+              Okay
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
   </v-app>
 </div>
 </template>
@@ -517,7 +541,9 @@ export default {
       transferSearchh: null,
       itemCategoryList: [],
       categoryId: null,
-      PrinterStatus: null
+      PrinterStatus: false,
+      MissingPrinterDataDialog: false,
+      MissingCategoriesLists: ''
     }
   },
   watch: {
@@ -793,16 +819,21 @@ export default {
        * else if conditon for checking if PaxId is there or not if waxId is not there it will show the pop-up
        * else if condition will run all API calls regarding Kitchen Order
        */
-      axios.checkAllPrinterStatus().then(response => {
-        console.log('Printer Status', response)
-        this.PrinterStatus = response
+      axios.checkAllPrinterStatus().then(data => {
+        // console.log('checkValidation', data)
+        if (data) {
+          this.PrinterStatus = false
+          this.MissingCategoriesLists = data
+        } else {
+          this.PrinterStatus = true
+        }
       })
-      // if (!this.PrinterStatus) {
-      //   this.snackbarcolor = 'error'
-      //   this.snackbarText = 'Please Add All Printer Data before Placing the Order'
-      //   this.snackbar = true
-      // } else
-      if (!this.paxId) {
+      if (!this.PrinterStatus) {
+        // this.snackbarcolor = 'error'
+        // this.snackbarText = 'Please Add All Printer Data before Placing the Order'
+        // this.snackbar = true
+        this.MissingPrinterDataDialog = true
+      } else if (!this.paxId) {
         this.snackbarcolor = 'error'
         this.snackbarText = 'Please Select the PAX Number'
         this.snackbar = true
