@@ -33,18 +33,17 @@ class Axios {
       return Response.data
     })
   }
-  getFoodItemList () {
-    const getFoodItemListUrl = process.env.API_BASE.concat('/api/Items')
+  getFoodItemList (key) {
+    const getFoodItemListUrl = process.env.API_BASE.concat('/api/Items?tableId=').concat(key)
     return this.axios.get(getFoodItemListUrl, {
       timeout: 50000
     }).then((Response) => {
       return Response.data
     })
   }
-  getFilteredItemList (key) {
-    if (key) {
-      const beforeUrl = process.env.API_BASE.concat('/api/Items?term=')
-      const getFilterFoodListUrl = beforeUrl.concat(key)
+  getFilteredItemList (searchkey, tableId) {
+    if (searchkey && tableId) {
+      const getFilterFoodListUrl = process.env.API_BASE.concat('/api/Items?term=').concat(searchkey).concat('&tableId=').concat(tableId)
       return this.axios.get(getFilterFoodListUrl, {
         timeout: 50000
       }).then((Response) => {
@@ -114,8 +113,8 @@ class Axios {
   printOrders (payload) {
     return this.axios.request({
       method: 'POST',
-      // url: process.env.API_BASE.concat('')
-      url: 'http://192.168.31.110/kottab/api/PrintKOT',
+      url: process.env.API_BASE.concat('/api/PrintKOT'),
+      // url: 'http://192.168.31.110/kottab/api/PrintKOT',
       responseType: 'json',
       data: payload,
       headers: {
@@ -159,6 +158,110 @@ class Axios {
       headers: {
         'content-type': 'application/json'
       }
+    })
+  }
+  getKcatId () {
+    const fetchKcatIdUrl = process.env.API_BASE.concat('/api/KOTCATList')
+    return this.axios.get(fetchKcatIdUrl, {
+      timeout: 50000
+    }).then((Response) => {
+      return Response.data
+    })
+  }
+  getFoodAreaId () {
+    const fetchFoodAreaIdUrl = process.env.API_BASE.concat('/api/FoodAreaList')
+    return this.axios.get(fetchFoodAreaIdUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  fetchPendingPaymentTables () {
+    const fetchPendingPaymentTablesUrl = process.env.API_BASE.concat('/api/PaymentTable')
+    return this.axios.get(fetchPendingPaymentTablesUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  filterVacantTables (key) {
+    const filterVacantTablesUrl = process.env.API_BASE.concat('/api/SearchVacantTable?term=').concat(key)
+    return this.axios.get(filterVacantTablesUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  filterOccupiedTables (key) {
+    const filterOccupiedTablesUrl = process.env.API_BASE.concat('/api/SearchOccupiedTable?term=').concat(key)
+    return this.axios.get(filterOccupiedTablesUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  filterPendingPaymentTables (key) {
+    const filterPendingPaymentTablesUrl = process.env.API_BASE.concat('/api/SearchPaymentTable?term=').concat(key)
+    return this.axios.get(filterPendingPaymentTablesUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  cancelActiveOrderQuantity (KOTNO, itemId, quantityNo) {
+    const cancelActiveOrderQuantityUrl = process.env.API_BASE.concat('/api/CancelItemQuantity?KOTNO=').concat(KOTNO).concat('&itemId=').concat(itemId).concat('&quantityNo=').concat(quantityNo)
+    return this.axios.get(cancelActiveOrderQuantityUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  merageTables (oldTableId, newTableId) {
+    const merageTableUrl = process.env.API_BASE.concat('/api/ShiftToNewTable?oldTableId=').concat(oldTableId).concat('&newTableId=').concat(newTableId).concat('&shifType=merge')
+    return this.axios.get(merageTableUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  fetchTableCount () {
+    const fetchTableCountUrl = process.env.API_BASE.concat('/api/TableCount')
+    return this.axios.get(fetchTableCountUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  transferTable (oldTableId, newTableId) {
+    const transferTableUrl = process.env.API_BASE.concat('/api/ShiftToNewTable?oldTableId=').concat(oldTableId).concat('&newTableId=').concat(newTableId).concat('&shifType=shift')
+    return this.axios.get(transferTableUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  printKOT (tableId) {
+    const printKOTURL = process.env.API_BASE.concat('/api/PrintKOT?tableId=').concat(tableId).concat('&print=Y&reprint=N&cancelled=N')
+    return this.axios.get(printKOTURL, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  rePrintKOT (tableId) {
+    const rePrintKOTURL = process.env.API_BASE.concat('/api/PrintKOT?tableId=').concat(tableId).concat('&print=N&reprint=Y&cancelled=N')
+    return this.axios.get(rePrintKOTURL, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  cancelPrintKOT (tableId) {
+    const cancelPrintKOTURL = process.env.API_BASE.concat('/api/PrintKOT?tableId=').concat(tableId).concat('&print=N&reprint=N&cancelled=Y')
+    return this.axios.get(cancelPrintKOTURL, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
     })
   }
 }

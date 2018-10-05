@@ -4,6 +4,9 @@
       <v-toolbar color="cyan" dark>
             <v-toolbar-title>Printer Settings</v-toolbar-title>
             <v-spacer></v-spacer>
+            <v-btn flat icon color="white" @click="home()">
+               <v-icon>home</v-icon>
+             </v-btn>
           <v-dialog v-model="Newdialog" max-width="500px">
           <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn>
           <v-card>
@@ -18,10 +21,28 @@
                     <v-text-field v-model="NewItem.Id" label="ID" disabled></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="NewItem.KCatId" label="KCatId"></v-text-field>
+                    <!-- <v-text-field v-model="NewItem.KCatId" label="KCatId"></v-text-field> -->
+                    <v-select
+                      :items="kcatIdList"
+                      v-model="NewItem.KCatId"
+                      label="Kcat ID"
+                      single-line
+                      item-text="KCATName"
+                      item-value="KCATID"
+                      autocomplete
+                    ></v-select>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="NewItem.FoodAreaID" label="FoodAreaID"></v-text-field>
+                    <!-- <v-text-field v-model="NewItem.FoodAreaID" label="FoodAreaID"></v-text-field> -->
+                    <v-select
+                      :items="FoodAreaId"
+                      v-model="NewItem.FoodAreaID"
+                      label="Food Area Id"
+                      single-line
+                      item-text="FoodAreaName"
+                      item-value="FoodAreaID"
+                      autocomplete
+                    ></v-select>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
                     <v-text-field v-model="NewItem.PrntPath" label="PrntPath"></v-text-field>
@@ -124,10 +145,28 @@
                     <v-text-field v-model="editedItem.Id" label="ID" disabled></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.KCatId" label="KCatId"></v-text-field>
+                    <v-select
+                      :items="kcatIdList"
+                      v-model="editedItem.KCatId"
+                      label="Kcat ID"
+                      single-line
+                      item-text="KCATName"
+                      item-value="KCATID"
+                      autocomplete
+                    ></v-select>
+                    <!-- <v-text-field v-model="editedItem.KCatId" label="KCatId"></v-text-field> -->
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.FoodAreaID" label="FoodAreaID"></v-text-field>
+                    <v-select
+                      :items="FoodAreaId"
+                      v-model="editedItem.FoodAreaID"
+                      label="Food Area Id"
+                      single-line
+                      item-text="FoodAreaName"
+                      item-value="FoodAreaID"
+                      autocomplete
+                    ></v-select>
+                    <!-- <v-text-field v-model="editedItem.FoodAreaID" label="FoodAreaID"></v-text-field> -->
                   </v-flex>
                   <v-flex xs12 sm6 md4>
                     <v-text-field v-model="editedItem.PrntPath" label="PrntPath"></v-text-field>
@@ -157,6 +196,7 @@
 </div>
 </template>
 <script>
+import router from '../router'
 import axios from './Services/httpClient.js'
 export default {
   data () {
@@ -201,7 +241,9 @@ export default {
         FoodAreaID: '',
         PrntPath: '',
         PrntCopy: ''
-      }
+      },
+      kcatIdList: [],
+      FoodAreaId: []
     }
   },
   computed: {
@@ -212,6 +254,9 @@ export default {
 
   beforeMount: function () {
     // this.fetchPrinterList()
+    this.adminAuth()
+    this.loadKcatId()
+    this.loadFoodAreaId()
   },
 
   watch: {
@@ -225,6 +270,12 @@ export default {
   },
 
   methods: {
+    adminAuth () {
+      if (localStorage.getItem('userType') !== 'ADMIN') {
+        console.log('Comin in Admin Auth')
+        router.push({name: 'NewHome'})
+      }
+    },
     editItem (item) {
       console.log('Edit Item', item)
       this.editedItem.Id = item.Id
@@ -303,6 +354,22 @@ export default {
         this.snackbarText = 'Please Enter Valid data'
         this.snackbar = true
       }
+    },
+
+    loadKcatId () {
+      axios.getKcatId().then(response => {
+        console.log('Kcat ID:', response)
+        this.kcatIdList = response
+      })
+    },
+    loadFoodAreaId () {
+      axios.getFoodAreaId().then(response => {
+        console.log('Food Area ID', response)
+        this.FoodAreaId = response
+      })
+    },
+    home () {
+      router.push({name: 'NewHome'})
     }
   }
 }
