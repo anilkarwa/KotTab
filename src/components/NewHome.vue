@@ -177,7 +177,7 @@ export default {
     this.getPendingPaymentTables()
     this.adminAuth()
     this.getTableCount()
-    // this.todo()
+    this.todo()
   },
   methods: {
     /**
