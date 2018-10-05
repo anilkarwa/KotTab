@@ -5,6 +5,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+Test.js
+Test2.js
+
 # Editor directories and files
 .idea
 *.suo
