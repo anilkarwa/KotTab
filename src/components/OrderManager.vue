@@ -423,7 +423,7 @@
         max-width="290"
       >
         <v-card>
-          <v-card-title class="headline">These Categories are missing in the list!</v-card-title>
+          <v-card-title class="headline">These Categories are missing in the Printer Setting!</v-card-title>
   
           <v-card-text>
             Category Name: <span style="color:red">{{ MissingCategoriesLists }}</span>.
@@ -820,73 +820,69 @@ export default {
        * else if condition will run all API calls regarding Kitchen Order
        */
       axios.checkAllPrinterStatus().then(data => {
-        // console.log('checkValidation', data)
-        if (data) {
-          this.PrinterStatus = false
+        console.log('checkValidation', data)
+        if (data !== 'true') {
+          console.log('Coming in If condition')
           this.MissingCategoriesLists = data
+          this.MissingPrinterDataDialog = true
         } else {
-          this.PrinterStatus = true
+          console.log('Coming in Else condition')
+          if (!this.paxId) {
+            this.snackbarcolor = 'error'
+            this.snackbarText = 'Please Select the PAX Number'
+            this.snackbar = true
+          } else if (!this.waiterId || this.waiterId <= 0) {
+            this.snackbarcolor = 'error'
+            this.snackbarText = 'Please Select the Waiter Id'
+            this.snackbar = true
+          } else if (this.waiterId && this.paxId) {
+            /**
+             * Final Order Body for API
+             */
+            var FinalOrder = {
+              TableId: localStorage.getItem('TableNumber'),
+              WaiterId: this.waiterId,
+              PAX: this.paxId,
+              AddedBy: 'User 1',
+              KOTDate: this.getKOTDate(),
+              TimeOfKOT: this.getKOTTime(),
+              AddedDateTime: this.getKOTDate() + ' ' + this.getKOTTime(),
+              ItemsList: this.Orderitems
+            }
+            console.log('Final Payload Body for order', FinalOrder)
+            /**
+            * Place The Order #send request to server
+            */
+            axios.placeOrder(FinalOrder).then(data => {
+              console.log('Place order response from server', data)
+              if (data.status === 200) {
+                // change table status
+                axios.updateTableStatus(localStorage.getItem('TableNumber')).then((response) => {
+                  console.log('Changin table status', response)
+                })
+                // send for Print
+                axios.printKOT(localStorage.getItem('TableNumber')).then(res => {
+                  console.log('Printer Response from server', res)
+                  this.snackbarcolor = 'success'
+                  this.snackbarText = 'Order Printing...'
+                  this.snackbar = true
+                })
+                console.log('Getting response from server is 200')
+                localStorage.removeItem('Orders')
+                this.$parent.Order = []
+                this.fetchActiveOrderList()
+                this.loadOrderItem()
+                this.snackbarcolor = 'success'
+                this.snackbarText = 'Order placed successfully'
+                this.snackbar = true
+                setTimeout(function () {
+                  router.push({name: 'NewHome'})
+                }, 3000)
+              }
+            })
+          }
         }
       })
-      if (!this.PrinterStatus) {
-        // this.snackbarcolor = 'error'
-        // this.snackbarText = 'Please Add All Printer Data before Placing the Order'
-        // this.snackbar = true
-        this.MissingPrinterDataDialog = true
-      } else if (!this.paxId) {
-        this.snackbarcolor = 'error'
-        this.snackbarText = 'Please Select the PAX Number'
-        this.snackbar = true
-      } else if (!this.waiterId || this.waiterId <= 0) {
-        this.snackbarcolor = 'error'
-        this.snackbarText = 'Please Select the Waiter Id'
-        this.snackbar = true
-      } else if (this.waiterId && this.paxId) {
-        /**
-         * Final Order Body for API
-         */
-        var FinalOrder = {
-          TableId: localStorage.getItem('TableNumber'),
-          WaiterId: this.waiterId,
-          PAX: this.paxId,
-          AddedBy: 'User 1',
-          KOTDate: this.getKOTDate(),
-          TimeOfKOT: this.getKOTTime(),
-          AddedDateTime: this.getKOTDate() + ' ' + this.getKOTTime(),
-          ItemsList: this.Orderitems
-        }
-        console.log('Final Payload Body for order', FinalOrder)
-        /**
-        * Place The Order #send request to server
-        */
-        axios.placeOrder(FinalOrder).then(data => {
-          console.log('Place order response from server', data)
-          if (data.status === 200) {
-            // change table status
-            axios.updateTableStatus(localStorage.getItem('TableNumber')).then((response) => {
-              console.log('Changin table status', response)
-            })
-            // send for Print
-            axios.printKOT(localStorage.getItem('TableNumber')).then(res => {
-              console.log('Printer Response from server', res)
-              this.snackbarcolor = 'success'
-              this.snackbarText = 'Order Printing...'
-              this.snackbar = true
-            })
-            console.log('Getting response from server is 200')
-            localStorage.removeItem('Orders')
-            this.$parent.Order = []
-            this.fetchActiveOrderList()
-            this.loadOrderItem()
-            this.snackbarcolor = 'success'
-            this.snackbarText = 'Order placed successfully'
-            this.snackbar = true
-            setTimeout(function () {
-              router.push({name: 'NewHome'})
-            }, 3000)
-          }
-        })
-      }
     },
     fetchActiveOrderList () {
       axios.fetchActiveOrderList(localStorage.getItem('TableNumber')).then((data) => {
