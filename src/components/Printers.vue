@@ -72,9 +72,9 @@
         class="elevation-1"
       >
         <template slot="items" slot-scope="props">
-          <td>{{ props.item.Id }}</td>
-          <td class="text-xs-right">{{ props.item.KCatId }}</td>
-          <td class="text-xs-right">{{ props.item.FoodAreaID }}</td>
+          <!-- <td>{{ props.item.Id }}</td> -->
+          <td class="text-xs-right">{{ props.item.KCatName }}</td>
+          <td class="text-xs-right">{{ props.item.FoodAreaName }}</td>
           <td class="text-xs-right">{{ props.item.PrntPath }}</td>
           <td class="text-xs-right">{{ props.item.PrntCopy }}</td>
           <td class="justify-center layout px-0">
@@ -237,13 +237,13 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-          <!-- Dialog box for Showing Missing Printer data list -->
+    <!-- Dialog box for Showing Missing Printer data list -->
     <v-dialog
         v-model="MissingPrinterDataDialog"
         max-width="290"
       >
         <v-card>
-          <v-card-title class="headline">These Categories are missing in the list!</v-card-title>
+          <v-card-title class="headline">These Categories are missing in the Prtiner Setting!</v-card-title>
   
           <v-card-text>
             Category Name: <span style="color:red">{{ MissingCategoriesLists }}</span>.
@@ -287,12 +287,12 @@ export default {
       DeletePrinterDataDialog: false,
       newPrinterData: false,
       headers: [
-        {
-          text: 'ID',
-          align: 'left',
-          sortable: false,
-          value: 'Id'
-        },
+        // {
+        //   text: 'ID',
+        //   align: 'left',
+        //   sortable: false,
+        //   value: 'Id'
+        // },
         { text: 'KCatId', value: 'KCatId' },
         { text: 'FoodAreaID', value: 'FoodAreaID' },
         { text: 'PrntPath', value: 'PrntPath' },
@@ -502,14 +502,14 @@ export default {
     checkValidation () {
       axios.checkAllPrinterStatus().then(data => {
         // console.log('checkValidation', data)
-        if (data) {
-          console.log('Something needs to add here!', data)
-          this.MissingCategoriesLists = data
-          this.MissingPrinterDataDialog = true
-        } else {
+        if (data === 'true') {
           this.snackbarColor = 'success'
           this.snackbarText = 'Everything is good to Go!'
           this.snackbar = true
+        } else {
+          console.log('Something needs to add here!', data)
+          this.MissingCategoriesLists = data
+          this.MissingPrinterDataDialog = true
         }
       })
     }
