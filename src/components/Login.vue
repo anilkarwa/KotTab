@@ -9,7 +9,7 @@
               <v-toolbar dark color="primary">
                 <v-flex xs12 sm12 md12 text-lg-center style="margin-top:3%">
                   <v-toolbar-title>
-                    <img src="http://softvent.com/images/logo.png" alt="Softvent Logo">
+                    <img src="./../assets/softvent-logo.png" alt="Softvent Logo">
                   </v-toolbar-title>
                 </v-flex>
                 <v-spacer></v-spacer>
@@ -89,6 +89,8 @@ export default {
           if (!(response.length === 0)) {
             localStorage.setItem('UserID', response[0].UserID)
             localStorage.setItem('userType', response[0].userType)
+            localStorage.setItem('UserName', response[0].UserName)
+            localStorage.setItem('companyName', response[0].companyName)
             router.push({name: 'NewHome', params: {resource: 'Test'}})
           } else {
             console.log('Invalid Username password')
@@ -105,7 +107,7 @@ export default {
 </script>
 <style>
 .background-design {
-  background-image: url("http://www.chezceleste.fr/images/demo/slides/slide-image-03.jpg/"); /* The image used */
+  background-image: url("./../assets/background-image.jpg"); /* The image used */
   background-color: #cccccc; /* Used if the image is unavailable */
   background-position: center; /* Center the image */
   background-repeat: no-repeat; /* Do not repeat the image */
