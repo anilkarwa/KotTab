@@ -6,7 +6,8 @@
             <v-spacer></v-spacer>
             <v-btn flat icon color="white" @click="home()">
                <v-icon>home</v-icon>
-             </v-btn>
+            </v-btn>
+            <v-btn color="primary" @click="printFormatdialog = true">Print Format Setting</v-btn>
           <v-dialog v-model="Newdialog" max-width="500px">
           <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn>
           <v-card>
@@ -107,7 +108,7 @@
           <v-card-title class="headline">Are you sure you wanna delete this?</v-card-title>
   
           <v-card-text>
-            Are you sure you wanna delete this Printer Data, if Yes click on agree button on right side.
+            Are you sure you wanna delete <span style="color:red">KCat Category Name: {{ confirmKCatName }}</span> Printer Data, if Yes click on agree button on right side.
           </v-card-text>
   
           <v-card-actions>
@@ -185,6 +186,56 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+        <!-- Model for Print Format Setting -->
+        <v-dialog v-model="printFormatdialog" persistent max-width="500px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Printer format setting</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container grid-list-md>
+              <v-layout wrap>
+                <v-flex xs12>
+                  <v-text-field label="companyName" v-model="companyName" required></v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field label="normalPrint" v-model="normalPrint" required></v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field label="rePrint" v-model="rePrint" required></v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field label="cancelledPrint" v-model="cancelledPrint" required></v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-select
+                    :items="showCompanyNameChoice"
+                    v-model="showCompanyName"
+                    label="showCompanyName"
+                    single-line
+                    item-text="name"
+                    item-value="value"
+                    autocomplete
+                  ></v-select>
+                  <!-- <v-text-field label="showCompanyName" v-model="showCompanyName" required></v-text-field> -->
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field label="lineBreakOnTop" v-model="lineBreakOnTop" type="number" required></v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field label="lineBreakOnBottom" v-model="lineBreakOnBottom" type="number" required></v-text-field>
+                </v-flex>
+              </v-layout>
+            </v-container>
+            <small>*indicates required field</small>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" flat @click.native="printFormatdialog = false">Close</v-btn>
+            <v-btn color="blue darken-1" flat @click.native="updatePrintFormat()">Save</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
               <v-snackbar
                 :timeout="snackbarTimeout"
                 :color="snackbarColor"
@@ -243,7 +294,26 @@ export default {
         PrntCopy: ''
       },
       kcatIdList: [],
-      FoodAreaId: []
+      FoodAreaId: [],
+      printFormatdialog: false,
+      cancelledPrint: '',
+      companyName: '',
+      lineBreakOnBottom: 0,
+      lineBreakOnTop: 0,
+      normalPrint: '',
+      rePrint: '',
+      showCompanyName: '',
+      showCompanyNameChoice: [
+        {
+          name: 'Yes',
+          value: 'Y'
+        },
+        {
+          name: 'No',
+          value: 'N'
+        }
+      ],
+      confirmKCatName: ''
     }
   },
   computed: {
@@ -257,6 +327,7 @@ export default {
     this.adminAuth()
     this.loadKcatId()
     this.loadFoodAreaId()
+    this.getPrintFormat()
   },
 
   watch: {
@@ -287,6 +358,8 @@ export default {
     },
 
     confirmDeleteDialof (item) {
+      console.log('Item List for delting the Printer', item.KCatName)
+      this.confirmKCatName = item.KCatName
       this.DeletePrinterDataDialog = true
       this.DeleteItem.Id = item.Id
       // this.deleteItem(item.Id)
@@ -370,6 +443,34 @@ export default {
     },
     home () {
       router.push({name: 'NewHome'})
+    },
+    getPrintFormat () {
+      axios.fetchPrintFormat().then(data => {
+        console.log('Data from Server for Print Format', data)
+        this.cancelledPrint = data.cancelledPrint
+        this.companyName = data.companyName
+        this.lineBreakOnBottom = data.lineBreakOnBottom
+        this.lineBreakOnTop = data.lineBreakOnTop
+        this.normalPrint = data.normalPrint
+        this.rePrint = data.rePrint
+        this.showCompanyName = data.showCompanyName
+      })
+    },
+    updatePrintFormat () {
+      const payload = {
+        companyName: this.companyName,
+        normalPrint: this.normalPrint,
+        rePrint: this.rePrint,
+        cancelledPrint: this.cancelledPrint,
+        showCompanyName: this.showCompanyName,
+        lineBreakOnTop: this.lineBreakOnTop,
+        lineBreakOnBottom: this.lineBreakOnBottom
+      }
+      axios.updatePrintFormat(payload).then(data => {
+        console.log('Update Req Respone', data)
+      })
+      console.log('Payload', payload)
+      this.printFormatdialog = false
     }
   }
 }

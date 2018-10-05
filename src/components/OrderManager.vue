@@ -9,19 +9,33 @@
                 v-model="searchFoodItem"
                 flat
                 solo-inverted
+                autofocus
                 prepend-icon="search"
                 label="Search Food Item"
                 @input="FilterFoodItem()"
-            ></v-text-field></v-card-title>
+            ></v-text-field>
+            </v-card-title>
+            <v-card-title>
+              <v-select
+                  :items="itemCategoryList"
+                  v-model="categoryId"
+                  label="Select Item Category"
+                  single-line
+                  item-text="ItemMenuGroupCode"
+                  item-value="ItemMenuGroupID"
+                  autocomplete
+                  @input="fetchItemByCategoryId()"
+              ></v-select>
+            </v-card-title>
           </v-card>
             <v-container class="itemContainer">
                 <div class="itemList">
                     <v-list two-line :search="searchFoodItem">
                     <template v-for="(item, index) in foodItem">
                     <v-list-tile :key="item.title" avatar @click="foodItemSelection(item.ItemID,item.ItemName,item.ItemRate,item.KCATID)">
-                        <v-list-tile-avatar>
+                        <!-- <v-list-tile-avatar>
                         <img src="./../assets/dinner.svg" >
-                        </v-list-tile-avatar>
+                        </v-list-tile-avatar> -->
                         <v-list-tile-content>
                         <v-list-tile-title v-html="item.ItemDispName"></v-list-tile-title>
                         <v-list-tile-sub-title v-html="item.ItemDesc"></v-list-tile-sub-title>
@@ -40,9 +54,11 @@
                 <span style="font-size:25px;"> {{ displayTableNumber() }} </span>
             </v-card-text>
           </v-card>
+          <v-btn color="info" @click="home()">Home</v-btn>
             <v-container v-if="vacantTable">
                 <v-layout row justify-space-around >
                     <v-flex xs3 class="text-md-center">
+                      <v-chip label outline color="blue">Pax Number:</v-chip>
                         <v-select
                             :items="paxData"
                             v-model="paxId"
@@ -54,6 +70,7 @@
                         ></v-select>
                     </v-flex>
                     <v-flex xs3 class="text-md-center">
+                      <v-chip label outline color="blue">Waiter Name:</v-chip>
                         <v-select
                             :items="waiterData"
                             v-model="waiterId"
@@ -73,11 +90,15 @@
                   class="elevation-1"
                   >
                     <template slot="items" slot-scope="props">
-                      <td>{{ props.item.ItemName }}</td>
-                      <td class="text-xs-right">
-                          <v-btn fab dark small color="red" @click="removeQuantity(props.item)"><v-icon dark>remove</v-icon></v-btn>
+                      <td> {{ props.item.ItemName }} <br/>
+                        <span style="font-size: 90%;color:red" v-if="props.item.AdditionalInstructions">
+                         {{props.item.AdditionalInstructions}}
+                        </span>
+                      </td>
+                      <td style="padding: 0 4px !important;">
+                          <v-btn fab dark small color="red" @click="removeQuantity(props.item)" style="width: 20px;height: 20px;"><v-icon dark>remove</v-icon></v-btn>
                           {{ props.item.KOTQuantity }}
-                          <v-btn fab dark small color="green" @click="addQuantity(props.item)"><v-icon dark>add</v-icon></v-btn>
+                          <v-btn fab dark small color="green" @click="addQuantity(props.item)" style="width: 20px;height: 20px;"><v-icon dark>add</v-icon></v-btn>
                       </td>
                       <td class="text-xs-right">{{ props.item.KOTRate }}</td>
                       <!-- <td class="text-xs-right">{{ props.item.KOTAmount }}</td> -->
@@ -108,43 +129,7 @@
                </div>
             </v-container>
             <v-container v-if="occupiedTable">
-               <v-layout row justify-center style="margin-top:1%">
-                   <v-data-table
-                  :headers="activeOrderHeaders"
-                  :items="activeOrderitems"
-                  hide-actions
-                  class="elevation-1"
-                  >
-                    <template slot="items" slot-scope="props">
-                      <td>{{ props.item.ItemName }}</td>
-                      <td class="text-xs-right">{{ props.item.KOTQuantity }}</td>
-                      <td class="text-xs-right">{{ props.item.KOTRate }}</td>
-                      <!-- <td class="text-xs-right">{{ props.item.KOTAmount }}</td> -->
-                      <td class="justify-center layout px-0">
-                        <v-btn icon class="mx-0" @click="modifyActiveOrder(props.item)">
-                          <v-icon color="teal">edit</v-icon>
-                        </v-btn>
-                        <!-- <v-btn icon class="mx-0">
-                          <v-icon color="pink">delete</v-icon>
-                        </v-btn> -->
-                      </td>
-                    </template>
-                    <template slot="no-data">
-                      <!-- <v-btn color="primary">Reset</v-btn> -->
-                      <p>No Active Order Available for This Table</p>
-                    </template>
-                  </v-data-table>
-               </v-layout>
-               <v-layout row>
-                 <v-spacer></v-spacer>
-                 <v-btn color="info" @click="TransferTableFun()">Transfer Table</v-btn> 
-                <v-spacer></v-spacer>
-               <v-btn color="info" @click="mergeTableFun()">Merge Tables</v-btn>
-               <v-spacer></v-spacer>
-               <v-btn color="info" @click="rePrintOrder()">Re-Print</v-btn>
-               <v-spacer></v-spacer>
-               </v-layout>
-               <v-layout row justify-center style="margin-top:1%">
+              <v-layout row justify-center style="margin-top:1%">
                  <v-data-table
                   :headers="headers"
                   :items="Orderitems"
@@ -152,13 +137,17 @@
                   class="elevation-1"
                   >
                     <template slot="items" slot-scope="props">
-                      <td>{{ props.item.ItemName }}</td>
-                      <td class="text-xs-right">
-                          <v-btn fab dark small color="red" @click="removeQuantity(props.item)"><v-icon dark>remove</v-icon></v-btn>
-                          {{ props.item.KOTQuantity }}
-                          <v-btn fab dark small color="green" @click="addQuantity(props.item)"><v-icon dark>add</v-icon></v-btn>
+                      <td>{{ props.item.ItemName }} <br/>
+                        <span style="font-size: 90%;color:red" v-if="props.item.AdditionalInstructions">
+                         {{props.item.AdditionalInstructions}}
+                        </span>
                       </td>
-                      <td class="text-xs-right">{{ props.item.KOTRate }}</td>
+                      <td style="padding: 0 4px !important;">
+                            <v-btn fab dark small color="red" @click="removeQuantity(props.item)" style="width: 20px;height: 20px;"><v-icon dark>remove</v-icon></v-btn>
+                          {{ props.item.KOTQuantity }}
+                          <v-btn fab dark small color="green" @click="addQuantity(props.item)" style="width: 20px;height: 20px;"><v-icon dark>add</v-icon></v-btn>
+                      </td>
+                      <td class="text-xs-center">{{ props.item.KOTRate }}</td>
                       <!-- <td class="text-xs-right">{{ props.item.KOTAmount }}</td> -->
                       <td class="justify-center layout px-0">
                         <v-btn icon class="mx-0"
@@ -179,12 +168,52 @@
                     </template>
                   </v-data-table>
               </v-layout>
-              <v-flex>
+                  <v-flex>
                       Total Quantity: {{vacantOrderQuantity}} || Total Amount: {{vacantOrderTotalAmount}}
               </v-flex>
                 <div class="text-xs-center">
                   <v-btn round color="success" @click="checkoutOrderInVacantTable()" dark>Place Kitchen Order</v-btn>
                </div>
+               <v-layout row>
+                 <v-spacer></v-spacer>
+                 <v-btn color="info" @click="TransferTableFun()">Transfer Table</v-btn> 
+                <v-spacer></v-spacer>
+               <v-btn color="info" @click="mergeTableFun()">Merge Tables</v-btn>
+               <v-spacer></v-spacer>
+               <v-btn color="info" @click="rePrintOrder()">Re-Print</v-btn>
+               <v-spacer></v-spacer>
+               </v-layout>
+                              <v-layout row justify-center style="margin-top:1%">
+                   <v-data-table
+                  :headers="activeOrderHeaders"
+                  :items="activeOrderitems"
+                  hide-actions
+                  class="elevation-1"
+                  >
+                    <template slot="items" slot-scope="props">
+                      <td>{{ props.item.ItemName }}<br/>
+                        <span style="font-size: 90%;color:red" v-if="props.item.AdditionalInstructions">
+                         {{props.item.AdditionalInstructions}}
+                        </span>
+                      </td>
+                      <td class="text-xs-right">{{ props.item.KOTQuantity }}</td>
+                      <td class="text-xs-right">{{ props.item.KOTRate }}</td>
+                      <!-- <td class="text-xs-right">{{ props.item.KOTAmount }}</td> -->
+                      <td class="justify-center layout px-0">
+                        <v-btn icon class="mx-0" @click="modifyActiveOrder(props.item)">
+                          <v-icon color="teal">edit</v-icon>
+                        </v-btn>
+                        <!-- <v-btn icon class="mx-0">
+                          <v-icon color="pink">delete</v-icon>
+                        </v-btn> -->
+                      </td>
+                    </template>
+                    <template slot="no-data">
+                      <!-- <v-btn color="primary">Reset</v-btn> -->
+                      <p>No Active Order Available for This Table</p>
+                    </template>
+                  </v-data-table>
+               </v-layout>
             </v-container>
         </v-flex>
       </v-layout>
@@ -203,13 +232,13 @@
                   </v-flex>
                   <v-flex xs12 align-end flexbox>
                   </v-flex>
-                  <v-flex xs12 sm6 md4>
+                  <v-flex xs12 sm4 md4>
                     <v-text-field v-model="editedItem.KOTQuantity" label="Quantity" disabled></v-text-field>
                   </v-flex>
-                  <v-flex xs12 sm6 md4>
+                  <v-flex xs12 sm4 md4>
                     <v-text-field v-model="editedItem.KOTRate" label="Rate" disabled></v-text-field>
                   </v-flex>
-                  <v-flex xs12 sm6 md4>
+                  <v-flex xs12 sm4 md4>
                     <v-text-field v-model="editedItem.KOTAmount" label="Amount" disabled></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
@@ -466,7 +495,8 @@ export default {
         KOTQuantity: '',
         totalCurrentQuantity: '',
         KOTRate: '',
-        SlNo: ''
+        SlNo: '',
+        KCATID: ''
       },
       editActiveOrderModel: false,
       mergeTableModel: false,
@@ -484,7 +514,10 @@ export default {
       transferTablesName: '',
       transferTabless: '',
       transferSearch: null,
-      transferSearchh: null
+      transferSearchh: null,
+      itemCategoryList: [],
+      categoryId: null,
+      PrinterStatus: null
     }
   },
   watch: {
@@ -510,6 +543,7 @@ export default {
     if (localStorage.getItem('TableType') === 'OccupiedTables') {
       this.fetchActiveOrderList()
     }
+    this.getItemCategory()
   },
   methods: {
     renderTableTypeView () {
@@ -634,6 +668,7 @@ export default {
         this.snackbarcolor = 'success'
         this.snackbarText = 'Successfully Added Into Cart'
         this.snackbar = true
+        this.searchFoodItem = ''
         // this.dialog = false
       }
       this.loadOrderItem()
@@ -758,6 +793,15 @@ export default {
        * else if conditon for checking if PaxId is there or not if waxId is not there it will show the pop-up
        * else if condition will run all API calls regarding Kitchen Order
        */
+      axios.checkAllPrinterStatus().then(response => {
+        console.log('Printer Status', response)
+        this.PrinterStatus = response
+      })
+      // if (!this.PrinterStatus) {
+      //   this.snackbarcolor = 'error'
+      //   this.snackbarText = 'Please Add All Printer Data before Placing the Order'
+      //   this.snackbar = true
+      // } else
       if (!this.paxId) {
         this.snackbarcolor = 'error'
         this.snackbarText = 'Please Select the PAX Number'
@@ -849,6 +893,7 @@ export default {
       this.editActiveOrderItem.totalCurrentQuantity = item.KOTQuantity
       this.editActiveOrderItem.KOTRate = item.KOTRate
       this.editActiveOrderItem.SlNo = item.SlNo
+      this.editActiveOrderItem.KCATID = item.KCATID
       this.editActiveOrderModel = true
     },
     cancelActiveOrder () {
@@ -862,9 +907,17 @@ export default {
         let QuantityToRemove = this.editActiveOrderItem.totalCurrentQuantity - this.editActiveOrderItem.KOTQuantity
         let KotNumber = this.editActiveOrderItem.KOTNO
         let ItemId = this.editActiveOrderItem.ItemId
+        let KCATID = this.editActiveOrderItem.KCATID
+        let ItemName = this.editActiveOrderItem.ItemName
+        let tableName = localStorage.getItem('TableName')
+        let wtrId = this.waiterId
+        let PAX = this.paxId
         console.log(QuantityToRemove, KotNumber, ItemId)
         axios.cancelActiveOrderQuantity(KotNumber, ItemId, QuantityToRemove).then(data => {
           console.log('Response from server for cancel the Quantity', data)
+          axios.cancelPrintKOT(KCATID, KotNumber, ItemName, QuantityToRemove, tableName, wtrId, PAX).then(res => {
+            console.log('cancel printout response', res)
+          })
           this.fetchActiveOrderList()
           this.editActiveOrderModel = false
         })
@@ -887,8 +940,10 @@ export default {
       })
     },
     MergeTwoTables () {
-      if (this.MerageTables && this.MerageTabless) {
-        axios.merageTables(this.MerageTables, this.MerageTabless).then(data => {
+      const oldTable = this.MerageTables
+      const newTable = this.MerageTabless
+      if (oldTable && newTable) {
+        axios.merageTables(oldTable, newTable).then(data => {
           console.log('Merge response from server', data)
           this.mergeTableModel = false
           this.snackbarcolor = 'success'
@@ -919,7 +974,9 @@ export default {
     transferTable () {
       console.log('Old Table', this.transferTables)
       console.log('New Table', this.transferTabless)
-      axios.transferTable(this.transferTables, this.transferTabless).then(data => {
+      const oldTable = this.transferTables
+      const newTable = this.transferTabless
+      axios.transferTable(oldTable, newTable).then(data => {
         console.log('Shift Table Response from server', data)
         this.transferTableModel = false
         this.snackbarcolor = 'success'
@@ -949,6 +1006,24 @@ export default {
         this.snackbar = true
         console.log('Reprint Response from server')
       })
+    },
+    getItemCategory () {
+      axios.fetchItemCategory().then(data => {
+        console.log('category in Response', data)
+        this.itemCategoryList = data
+        console.log('this.itemCategoryList', this.itemCategoryList)
+      })
+    },
+    fetchItemByCategoryId () {
+      console.log('Calling on Onchange', this.categoryId)
+      const tableNumber = localStorage.getItem('TableNumber')
+      axios.fetchItemByCategory(tableNumber, this.categoryId).then(data => {
+        console.log('Fetch Item by category', data)
+        this.foodItem = data
+      })
+    },
+    home () {
+      router.push({name: 'NewHome'})
     }
   }
 }

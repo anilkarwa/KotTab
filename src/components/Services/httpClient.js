@@ -43,7 +43,8 @@ class Axios {
   }
   getFilteredItemList (searchkey, tableId) {
     if (searchkey && tableId) {
-      const getFilterFoodListUrl = process.env.API_BASE.concat('/api/Items?term=').concat(searchkey).concat('&tableId=').concat(tableId)
+      // const getFilterFoodListUrl = process.env.API_BASE.concat('/api/Items?term=').concat(searchkey).concat('&tableId=').concat(tableId)
+      const getFilterFoodListUrl = process.env.API_BASE.concat('/api/Items?term=').concat(searchkey).concat('&tableId=').concat(tableId).concat('&itemGroupId=0')
       return this.axios.get(getFilterFoodListUrl, {
         timeout: 50000
       }).then((Response) => {
@@ -256,9 +257,52 @@ class Axios {
       return response.data
     })
   }
-  cancelPrintKOT (tableId) {
-    const cancelPrintKOTURL = process.env.API_BASE.concat('/api/PrintKOT?tableId=').concat(tableId).concat('&print=N&reprint=N&cancelled=Y')
+  cancelPrintKOT (KCATID, KOTNO, itemName, cancelledQty, tableName, wtrId, PAX) {
+    const cancelPrintKOTURL = process.env.API_BASE.concat('/api/CancellSingleItemPrint?KCATID=').concat(KCATID).concat('&KOTNO=').concat(KOTNO).concat('&itemName=').concat(itemName).concat('&cancelledQty=').concat(cancelledQty).concat('&tableName=').concat(tableName).concat('&wtrId=').concat(wtrId).concat('&PAX=').concat(PAX)
     return this.axios.get(cancelPrintKOTURL, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  fetchItemCategory () {
+    const fetchItemCategoryURL = process.env.API_BASE.concat('/api/ItemMenuGroupList')
+    return this.axios.get(fetchItemCategoryURL, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  fetchItemByCategory (tableId, categoryId) {
+    const fetchItemByCategoryURL = process.env.API_BASE.concat('/api/Items?tableId=').concat(tableId).concat('&itemGroupId=').concat(categoryId)
+    return this.axios.get(fetchItemByCategoryURL, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  fetchPrintFormat () {
+    const fetchPrintFormatUrl = process.env.API_BASE.concat('/api/PrintFormat')
+    return this.axios.get(fetchPrintFormatUrl, {
+      timeout: 50000
+    }).then(response => {
+      return response.data
+    })
+  }
+  updatePrintFormat (payload) {
+    return this.axios.request({
+      method: 'PUT',
+      url: process.env.API_BASE.concat('/api/PrintFormat'),
+      data: payload,
+      responseType: 'json',
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+  }
+  checkAllPrinterStatus () {
+    const checkAllPrinterStatusUrl = process.env.API_BASE.concat('/api/CheckAllPrinterAddStatus')
+    return this.axios.get(checkAllPrinterStatusUrl, {
       timeout: 50000
     }).then(response => {
       return response.data
