@@ -91,6 +91,7 @@ export default {
             localStorage.setItem('userType', response[0].userType)
             localStorage.setItem('UserName', response[0].UserName)
             localStorage.setItem('companyName', response[0].companyName)
+            localStorage.setItem('TABNO', response[0].TABNO)
             router.push({name: 'NewHome', params: {resource: 'Test'}})
           } else {
             console.log('Invalid Username password')

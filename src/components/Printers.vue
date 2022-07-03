@@ -1,7 +1,7 @@
 <template>
 <div id="app">
   <v-app id="inspire">
-      <v-toolbar color="cyan" dark>
+      <v-toolbar color="blue darken-3" dark>
             <v-toolbar-title>Printer Settings</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn flat icon color="white" @click="home()">
@@ -47,10 +47,22 @@
                     ></v-select>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="NewItem.caption" label="Caption"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
                     <v-text-field v-model="NewItem.PrntPath" label="PrntPath"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
                     <v-text-field v-model="NewItem.PrntCopy" label="PrntCopy"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="NewItem.caption2" label="Caption 2"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="NewItem.PrntPath2" label="PrntPath2"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="NewItem.PrntCopy2" label="PrntCopy2"></v-text-field>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -73,10 +85,14 @@
       >
         <template slot="items" slot-scope="props">
           <!-- <td>{{ props.item.Id }}</td> -->
-          <td class="text-xs-right">{{ props.item.KCatName }}</td>
-          <td class="text-xs-right">{{ props.item.FoodAreaName }}</td>
-          <td class="text-xs-right">{{ props.item.PrntPath }}</td>
-          <td class="text-xs-right">{{ props.item.PrntCopy }}</td>
+          <td >{{ props.item.KCatName }}</td>
+          <td >{{ props.item.FoodAreaName }}</td>
+          <td >{{ props.item.kotTitle }}</td>
+          <td >{{ props.item.PrntPath }}</td>
+          <td >{{ props.item.PrntCopy }}</td>
+          <td >{{ props.item.kotTitle2 }}</td>
+          <td >{{ props.item.PrntPath2 }}</td>
+          <td >{{ props.item.PrntCopy2 }}</td>
           <td class="justify-center layout px-0">
             <v-icon
               small
@@ -171,10 +187,22 @@
                     <!-- <v-text-field v-model="editedItem.FoodAreaID" label="FoodAreaID"></v-text-field> -->
                   </v-flex>
                   <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedItem.caption" label="Caption"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
                     <v-text-field v-model="editedItem.PrntPath" label="PrntPath"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
                     <v-text-field v-model="editedItem.PrntCopy" label="PrntCopy"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedItem.caption2" label="Caption 2"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedItem.PrntPath2" label="PrntPath2"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedItem.PrntCopy2" label="PrntCopy2"></v-text-field>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -197,22 +225,22 @@
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12>
-                  <v-text-field label="companyName" v-model="companyName" required></v-text-field>
+                  <v-text-field label="Company Name" v-model="companyName" required></v-text-field>
                 </v-flex>
                 <v-flex xs12>
-                  <v-text-field label="normalPrint" v-model="normalPrint" required></v-text-field>
+                  <v-text-field label="Normal Print" v-model="normalPrint" required></v-text-field>
                 </v-flex>
                 <v-flex xs12>
-                  <v-text-field label="rePrint" v-model="rePrint" required></v-text-field>
+                  <v-text-field label="Re-Print" v-model="rePrint" required></v-text-field>
                 </v-flex>
                 <v-flex xs12>
-                  <v-text-field label="cancelledPrint" v-model="cancelledPrint" required></v-text-field>
+                  <v-text-field label="Cancelled Print" v-model="cancelledPrint" required></v-text-field>
                 </v-flex>
                 <v-flex xs12>
                   <v-select
                     :items="showCompanyNameChoice"
                     v-model="showCompanyName"
-                    label="showCompanyName"
+                    label="Show Company Name"
                     single-line
                     item-text="name"
                     item-value="value"
@@ -221,10 +249,20 @@
                   <!-- <v-text-field label="showCompanyName" v-model="showCompanyName" required></v-text-field> -->
                 </v-flex>
                 <v-flex xs12>
-                  <v-text-field label="lineBreakOnTop" v-model="lineBreakOnTop" type="number" required></v-text-field>
+                  <v-text-field label="Line Break On Top" v-model="lineBreakOnTop" type="number" required></v-text-field>
                 </v-flex>
                 <v-flex xs12>
-                  <v-text-field label="lineBreakOnBottom" v-model="lineBreakOnBottom" type="number" required></v-text-field>
+                  <v-text-field label="Line Break On Bottom" v-model="lineBreakOnBottom" type="number" required></v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-switch
+                    v-model="counterPrint"
+                    :label="`Counter Print`"
+                    color="primary"
+                  ></v-switch>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field label="Counter Print Path" v-model="counterPrintPath" type="text"></v-text-field>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -294,9 +332,13 @@ export default {
         //   value: 'Id'
         // },
         { text: 'KCatId', value: 'KCatId' },
-        { text: 'FoodAreaID', value: 'FoodAreaID' },
-        { text: 'PrntPath', value: 'PrntPath' },
-        { text: 'PrntCopy', value: 'PrntCopy' },
+        { text: 'Food Area ID', value: 'FoodAreaID' },
+        { text: 'Caption', value: 'kotTitle' },
+        { text: 'Printer Path', value: 'PrntPath' },
+        { text: 'Print Copies', value: 'PrntCopy' },
+        { text: 'Caption 2', value: 'kotTitle2' },
+        { text: 'Printer Path 2', value: 'PrntPath2' },
+        { text: 'Print Copies 2', value: 'PrntCopy2' },
         { text: 'Actions', value: 'name', sortable: false }
       ],
       desserts: [],
@@ -305,8 +347,12 @@ export default {
         Id: '',
         KCatId: 0,
         FoodAreaID: 0,
-        PrntPath: 0,
-        PrntCopy: 0
+        caption: '',
+        PrntPath: '',
+        PrntCopy: 0,
+        caption2: '',
+        PrntPath2: '',
+        PrntCopy2: 0
       },
       DeleteItem: {
         Id: ''
@@ -315,8 +361,12 @@ export default {
         Id: '',
         KCatId: '',
         FoodAreaID: '',
+        caption: '',
         PrntPath: '',
-        PrntCopy: ''
+        PrntCopy: '',
+        caption2: '',
+        PrntPath2: '',
+        PrntCopy2: ''
       },
       kcatIdList: [],
       FoodAreaId: [],
@@ -326,6 +376,8 @@ export default {
       companyName: '',
       lineBreakOnBottom: 0,
       lineBreakOnTop: 0,
+      counterPrint: true,
+      counterPrintPath: '',
       normalPrint: '',
       rePrint: '',
       showCompanyName: '',
@@ -379,8 +431,12 @@ export default {
       this.editedItem.Id = item.Id
       this.editedItem.KCatId = item.KCatId
       this.editedItem.FoodAreaID = item.FoodAreaID
+      this.editedItem.caption = item.kotTitle
       this.editedItem.PrntPath = item.PrntPath
       this.editedItem.PrntCopy = item.PrntCopy
+      this.editedItem.caption2 = item.kotTitle2
+      this.editedItem.PrntPath2 = item.PrntPath2
+      this.editedItem.PrntCopy2 = item.PrntCopy2
       this.dialog = true
     },
 
@@ -417,7 +473,7 @@ export default {
     },
 
     save () {
-      const parameter = 'api/PrinterSettings/' + this.editedItem.Id + '?kcatid=' + this.editedItem.KCatId + '&foodareaid=' + this.editedItem.FoodAreaID + '&printpath=' + this.editedItem.PrntPath + '&printcopy=' + this.editedItem.PrntCopy
+      const parameter = 'api/PrinterSettings/' + this.editedItem.Id + '?kcatid=' + this.editedItem.KCatId + '&foodareaid=' + this.editedItem.FoodAreaID + '&printpath=' + this.editedItem.PrntPath + '&printcopy=' + this.editedItem.PrntCopy + '&printpath2=' + this.editedItem.PrntPath2 + '&printcopy2=' + this.editedItem.PrntCopy2 + '&kottitle=' + this.editedItem.caption + '&kottitle2=' + this.editedItem.caption2
       axios.updatePrinterdata(parameter).then(response => {
         if (response.status === 200) {
           this.fetchPrinterList()
@@ -438,7 +494,7 @@ export default {
 
     AddNewPrinterData () {
       if (this.NewItem.KCatId && this.NewItem.FoodAreaID && this.NewItem.PrntPath && this.NewItem.PrntCopy) {
-        const parameter = 'api/PrinterSettings?kcatid=' + this.NewItem.KCatId + '&foodareaid=' + this.NewItem.FoodAreaID + '&printpath=' + this.NewItem.PrntPath + '&printcopy=' + this.NewItem.PrntCopy
+        const parameter = 'api/PrinterSettings?kcatid=' + this.NewItem.KCatId + '&foodareaid=' + this.NewItem.FoodAreaID + '&printpath=' + this.NewItem.PrntPath + '&printcopy=' + this.NewItem.PrntCopy + '&printpath2=' + this.NewItem.PrntPath2 + '&printcopy2=' + this.NewItem.PrntCopy2 + '&kottitle=' + this.NewItem.caption + '&kottitle2=' + this.NewItem.caption2
         axios.addPrinterData(parameter).then(response => {
           if (response.status === 200) {
             this.fetchPrinterList()
@@ -481,6 +537,8 @@ export default {
         this.normalPrint = data.normalPrint
         this.rePrint = data.rePrint
         this.showCompanyName = data.showCompanyName
+        this.counterPrint = data.counterPrint === 'Y'
+        this.counterPrintPath = data.counterPrintPath
       })
     },
     updatePrintFormat () {
@@ -491,7 +549,9 @@ export default {
         cancelledPrint: this.cancelledPrint,
         showCompanyName: this.showCompanyName,
         lineBreakOnTop: this.lineBreakOnTop,
-        lineBreakOnBottom: this.lineBreakOnBottom
+        lineBreakOnBottom: this.lineBreakOnBottom,
+        counterPrint: this.counterPrint ? 'Y' : 'N',
+        counterPrintPath: this.counterPrintPath
       }
       axios.updatePrintFormat(payload).then(data => {
         console.log('Update Req Respone', data)

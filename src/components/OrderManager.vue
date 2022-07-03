@@ -1,22 +1,12 @@
 <template>
 <div id="app">
   <v-app id="inspire">
-    <v-container grid-list-md text-xs-center>
+    <v-container grid-list-md text-xs-center fluid>
       <v-layout row wrap>
         <v-flex xs12 sm4 md4 class="elevation-24">
           <v-card dark color="blue darken-3">
-            <v-card-title><v-text-field
-                v-model="searchFoodItem"
-                flat
-                solo-inverted
-                autofocus
-                prepend-icon="search"
-                label="Search Food Item"
-                @input="FilterFoodItem()"
-            ></v-text-field>
-            </v-card-title>
-            <v-card-title>
-              <v-select
+            <!--<v-card-title class="card-title">
+               <v-select
                   :items="itemCategoryList"
                   v-model="categoryId"
                   label="Select Item Category"
@@ -25,10 +15,22 @@
                   item-value="ItemMenuGroupID"
                   autocomplete
                   @input="fetchItemByCategoryId()"
-              ></v-select>
+              ></v-select> 
+            </v-card-title>-->
+            <v-card-title class="card-title">
+              <v-text-field
+                ref="searchInput"
+                v-model="searchFoodItem"
+                flat
+                solo-inverted
+                autofocus
+                prepend-icon="search"
+                label="Search Food Item"
+                @input="FilterFoodItem()"
+              ></v-text-field>
             </v-card-title>
           </v-card>
-            <v-container class="itemContainer">
+            <v-container class="itemContainer" fluid>
                 <div class="itemList">
                     <v-list two-line :search="searchFoodItem">
                     <template v-for="(item, index) in foodItem">
@@ -38,7 +40,7 @@
                         </v-list-tile-avatar> -->
                         <v-list-tile-content>
                         <v-list-tile-title v-html="item.ItemDispName"></v-list-tile-title>
-                        <v-list-tile-sub-title v-html="item.ItemDesc"></v-list-tile-sub-title>
+                        <!-- <v-list-tile-sub-title v-html="item.ItemDesc"></v-list-tile-sub-title> -->
                         </v-list-tile-content>
                     </v-list-tile>
                     <v-divider :key="index"></v-divider>
@@ -49,16 +51,16 @@
         </v-flex>
         <v-flex xs12 sm7 md7 class="elevation-23 ml-3">
           <v-card dark color="blue darken-3">
-            <v-card-text>
-                <span style="font-size:25px;margin-right:1%">Table Number:</span>
-                <span style="font-size:25px;"> {{ displayTableNumber() }} </span>
+            <v-card-text style="padding: 2px">
+                <span style="font-size:16px;margin-right:1%">Table Number:</span>
+                <span style="font-size:16px;"> {{ displayTableNumber() }} </span>
+                <v-icon style="margin-left:100px"  @click="home()">home</v-icon>
             </v-card-text>
+
           </v-card>
-          <v-btn color="info" @click="home()">Home</v-btn>
-            <v-container v-if="vacantTable">
-                <v-layout row justify-space-around >
-                    <v-flex xs3 class="text-md-center">
-                      <v-chip label outline color="blue">Pax Number:</v-chip>
+            <v-container v-if="vacantTable" fluid>
+                <v-layout row wrap justify-space-between style="align-items: baseline; margin-bottom: 10px">
+                      <v-chip label>Pax:</v-chip>
                         <v-select
                             :items="paxData"
                             v-model="paxId"
@@ -67,10 +69,9 @@
                             item-text="paxSl"
                             item-value="paxSl"
                             autocomplete
+                            style="max-width: 50px"
                         ></v-select>
-                    </v-flex>
-                    <v-flex xs3 class="text-md-center">
-                      <v-chip label outline color="blue">Waiter Name:</v-chip>
+                      <v-chip style="margin-left: 10px" label>Waiter:</v-chip>
                         <v-select
                             :items="waiterData"
                             v-model="waiterId"
@@ -79,8 +80,9 @@
                             item-text="WTRName"
                             item-value="WTRID"
                             autocomplete
+                            style="max-width: 70px"
                         ></v-select>
-                    </v-flex>
+                        
                 </v-layout>
                 <v-layout row justify-center>
                  <v-data-table
@@ -125,10 +127,10 @@
                       Total Quantity: {{vacantOrderQuantity}} || Total Amount: {{vacantOrderTotalAmount}}
               </v-flex>
                 <div class="text-xs-center">
-                  <v-btn round color="success" @click="checkoutOrderInVacantTable()" dark>Place Kitchen Order</v-btn>
+                  <v-btn round color="success" :disabled="isLoading" @click="checkoutOrderInVacantTable()" >Place Kitchen Order</v-btn>
                </div>
             </v-container>
-            <v-container v-if="occupiedTable">
+            <v-container v-if="occupiedTable" fluid>
               <v-layout row justify-center style="margin-top:1%">
                  <v-data-table
                   :headers="headers"
@@ -172,15 +174,15 @@
                       Total Quantity: {{vacantOrderQuantity}} || Total Amount: {{vacantOrderTotalAmount}}
               </v-flex>
                 <div class="text-xs-center">
-                  <v-btn round color="success" @click="checkoutOrderInVacantTable()" dark>Place Kitchen Order</v-btn>
+                  <v-btn round color="success" :disabled="isLoading" @click="checkoutOrderInVacantTable()">Place Kitchen Order</v-btn>
                </div>
                <v-layout row>
                  <v-spacer></v-spacer>
-                 <v-btn color="info" @click="TransferTableFun()">Transfer Table</v-btn> 
+                 <v-btn color="info" :disabled="isLoading" @click="TransferTableFun()">Transfer Table</v-btn> 
                 <v-spacer></v-spacer>
-               <v-btn color="info" @click="mergeTableFun()">Merge Tables</v-btn>
+               <v-btn color="info" :disabled="isLoading" @click="mergeTableFun()">Merge Tables</v-btn>
                <v-spacer></v-spacer>
-               <v-btn color="info" @click="rePrintOrder()">Re-Print</v-btn>
+               <v-btn disabled color="info"  @click="rePrintOrder()">Re-Print</v-btn>
                <v-spacer></v-spacer>
                </v-layout>
                               <v-layout row justify-center style="margin-top:1%">
@@ -278,7 +280,7 @@
                   </v-flex>
                   <v-flex xs12 sm12 md12>
                     <td class="text-xs-right">
-                        <v-btn fab dark small color="red" @click="cancelActiveOrder()"><v-icon dark>remove</v-icon></v-btn>
+                        <v-btn style="width:20px; height: 20px;" fab dark small color="red" @click="cancelActiveOrder()"><v-icon dark>remove</v-icon></v-btn>
                         {{ editActiveOrderItem.KOTQuantity }}
                         <!-- <v-btn fab dark small color="green" @click="addQuantity(props.item)"><v-icon dark>add</v-icon></v-btn> -->
                     </td>
@@ -457,6 +459,49 @@ export default {
       paxData: [],
       paxId: 1,
       waiterData: [],
+      caption: parseInt(localStorage.getItem('TABNO') || 0),
+      captions: [
+        {
+          text: '1',
+          value: 1
+        },
+        {
+          text: '2',
+          value: 2
+        },
+        {
+          text: '3',
+          value: 3
+        },
+        {
+          text: '4',
+          value: 4
+        },
+        {
+          text: '5',
+          value: 5
+        },
+        {
+          text: '6',
+          value: 6
+        },
+        {
+          text: '7',
+          value: 7
+        },
+        {
+          text: '8',
+          value: 8
+        },
+        {
+          text: '9',
+          value: 9
+        },
+        {
+          text: '10',
+          value: 10
+        }
+      ],
       waiterId: null,
       headers: [
         {
@@ -543,7 +588,8 @@ export default {
       categoryId: null,
       PrinterStatus: false,
       MissingPrinterDataDialog: false,
-      MissingCategoriesLists: ''
+      MissingCategoriesLists: '',
+      isLoading: false
     }
   },
   watch: {
@@ -586,7 +632,7 @@ export default {
       console.log('EVENT', this.searchFoodItem)
       const tableNumber = localStorage.getItem('TableNumber')
       if (this.searchFoodItem) {
-        axios.getFilteredItemList(this.searchFoodItem, tableNumber).then((data) => {
+        axios.getFilteredItemList(this.searchFoodItem, tableNumber, this.categoryId).then((data) => {
           this.foodItem = data
         })
       } else {
@@ -607,8 +653,10 @@ export default {
       this.newItem.ItemId = itemId
       this.newItem.ItemName = itemName
       this.newItem.KOTRate = itemRate
-      this.newItem.KOTAmount = this.newItem.KOTRate * this.newItem.KOTQuantity
+      this.newItem.KOTAmount = itemRate * this.newItem.KOTQuantity
       this.newItem.KCATID = itemKCATID
+      this.$refs.searchInput.focus()
+      console.log('Item Details', this.newItem)
       this.addItemIncart()
     },
     createPaxId () {
@@ -626,11 +674,9 @@ export default {
       let repeatOrder = false
       console.log('TTT', localStorage.getItem('Orders'))
       if (!localStorage.getItem('Orders')) {
-        console.log('Yhai hai bhai vo', this.$parent.Order)
         localStorage.setItem('Orders', JSON.stringify(this.$parent.Order))
       }
       if (self.newItem.ItemId && self.newItem.SlNo && self.newItem.ItemName && self.newItem.KOTQuantity > 0 && self.newItem.KOTRate > 0 && self.newItem.KOTAmount === self.newItem.KOTQuantity * self.newItem.KOTRate) {
-        console.log('Coming')
         const preOrderItem = {
           ItemId: self.newItem.ItemId,
           ItemName: self.newItem.ItemName,
@@ -645,44 +691,31 @@ export default {
         console.log('Test 1', localStorage.getItem('Orders'))
         this.$parent.Order = JSON.parse(localStorage.getItem('Orders'))
         this.$parent.Order.forEach(data => {
-          console.log('Data In Loop---**', data)
           if (data.ItemId === preOrderItem.ItemId) {
-            console.log('Repeating the order', data)
             data.KOTQuantity += 1
+            data.KOTAmount = data.KOTQuantity * data.KOTRate
             repeatOrder = true
           }
         })
         if (this.$parent.Order.length === 0) {
-          console.log('YOOO')
-          // this.$parent.Order = JSON.parse(localStorage.getItem('Orders'))
           this.$parent.Order.push(preOrderItem)
         } else if (!repeatOrder) {
-          console.log('ELSEEE')
-          console.log('Local Store Value', JSON.parse(localStorage.getItem('Orders')))
-          // this.$parent.Order = JSON.parse(localStorage.getItem('Orders'))
           this.$parent.Order.push(preOrderItem)
         }
         this.vacantOrderQuantity = this.$parent.Order.length
         this.vacantOrderTotalAmount = this.vacantOrderTotalAmount + preOrderItem.KOTAmount
         let orderSl = 1
         if (this.occupiedTable) {
-          console.log('COming in if bcz its occupied table')
           let activeOrderQuantity = JSON.parse(localStorage.getItem('activeOrders')).length
           if (activeOrderQuantity > 0) {
-            console.log('Current Table Order Item List Length', activeOrderQuantity)
             orderSl = activeOrderQuantity + 1
           }
         }
         this.$parent.Order.forEach(data => {
-          console.log('Reorder the Order Loop', data.SlNo)
           data.SlNo = orderSl
-          console.log('this.vacantOrderTotalAmount', this.vacantOrderTotalAmount)
-          console.log('data.KOTAmount', data.KOTAmount)
-          console.log('After Adding', this.vacantOrderTotalAmount)
           orderSl++
         })
         localStorage.setItem('Orders', JSON.stringify(this.$parent.Order))
-        console.log('Local Storage', JSON.parse(localStorage.getItem('Orders')))
         this.newItem.KOTQuantity = 1
         this.newItem.ItemId = 0
         this.newItem.SlNo = 1
@@ -774,6 +807,7 @@ export default {
     },
     deleteOrderItem (item) {
       const index = this.Orderitems.indexOf(item)
+      console.log('vacantOrderTotalAmoun=>', this.vacantOrderTotalAmount, this.Orderitems[index])
       this.vacantOrderTotalAmount = this.vacantOrderTotalAmount - this.Orderitems[index].KOTAmount
       this.Orderitems.splice(index, 1)
       localStorage.setItem('Orders', JSON.stringify(this.Orderitems))
@@ -819,23 +853,30 @@ export default {
        * else if conditon for checking if PaxId is there or not if waxId is not there it will show the pop-up
        * else if condition will run all API calls regarding Kitchen Order
        */
+      this.isLoading = true
       axios.checkAllPrinterStatus().then(data => {
-        console.log('checkValidation', data)
         if (data !== 'true') {
-          console.log('Coming in If condition')
           this.MissingCategoriesLists = data
           this.MissingPrinterDataDialog = true
+          this.isLoading = false
         } else {
-          console.log('Coming in Else condition')
           if (!this.paxId) {
             this.snackbarcolor = 'error'
             this.snackbarText = 'Please Select the PAX Number'
             this.snackbar = true
+            this.isLoading = false
           } else if (!this.waiterId || this.waiterId <= 0) {
             this.snackbarcolor = 'error'
             this.snackbarText = 'Please Select the Waiter Id'
             this.snackbar = true
-          } else if (this.waiterId && this.paxId) {
+            this.isLoading = false
+          } else if (!this.caption || this.caption <= 0) {
+            this.snackbarcolor = 'error'
+            this.snackbarText = 'Please Select the Caption Number'
+            this.snackbar = true
+            this.isLoading = false
+          } else if (this.waiterId && this.paxId && this.caption) {
+            this.isLoading = true
             /**
              * Final Order Body for API
              */
@@ -854,20 +895,16 @@ export default {
             * Place The Order #send request to server
             */
             axios.placeOrder(FinalOrder).then(data => {
-              console.log('Place order response from server', data)
               if (data.status === 200) {
                 // change table status
                 axios.updateTableStatus(localStorage.getItem('TableNumber')).then((response) => {
-                  console.log('Changin table status', response)
                 })
                 // send for Print
-                axios.printKOT(localStorage.getItem('TableNumber')).then(res => {
-                  console.log('Printer Response from server', res)
+                axios.printKOT(localStorage.getItem('TableNumber'), this.caption).then(res => {
                   this.snackbarcolor = 'success'
                   this.snackbarText = 'Order Printing...'
                   this.snackbar = true
                 })
-                console.log('Getting response from server is 200')
                 localStorage.removeItem('Orders')
                 this.$parent.Order = []
                 this.fetchActiveOrderList()
@@ -879,9 +916,15 @@ export default {
                   router.push({name: 'NewHome'})
                 }, 3000)
               }
+            }).catch(err => {
+              this.isLoading = false
+              console.log('err=>', err)
             })
           }
         }
+      }).catch(error => {
+        this.isLoading = false
+        console.log('err=>', error)
       })
     },
     fetchActiveOrderList () {
@@ -931,6 +974,7 @@ export default {
     },
     updateModifyActiveOrder () {
       if (this.editActiveOrderItem.totalCurrentQuantity > this.editActiveOrderItem.KOTQuantity) {
+        this.isLoading = true
         let QuantityToRemove = this.editActiveOrderItem.totalCurrentQuantity - this.editActiveOrderItem.KOTQuantity
         let KotNumber = this.editActiveOrderItem.KOTNO
         let ItemId = this.editActiveOrderItem.ItemId
@@ -942,11 +986,18 @@ export default {
         console.log(QuantityToRemove, KotNumber, ItemId)
         axios.cancelActiveOrderQuantity(KotNumber, ItemId, QuantityToRemove).then(data => {
           console.log('Response from server for cancel the Quantity', data)
-          axios.cancelPrintKOT(KCATID, KotNumber, ItemName, QuantityToRemove, tableName, wtrId, PAX).then(res => {
+          axios.cancelPrintKOT(KCATID, KotNumber, ItemName, QuantityToRemove, tableName, wtrId, PAX, this.caption).then(res => {
             console.log('cancel printout response', res)
+            this.isLoading = false
+          }).catch(err => {
+            this.isLoading = false
+            console.log('err=>', err)
           })
           this.fetchActiveOrderList()
           this.editActiveOrderModel = false
+        }).catch(error => {
+          this.isLoading = false
+          console.log('error=>', error)
         })
       }
     },
@@ -967,6 +1018,7 @@ export default {
       })
     },
     MergeTwoTables () {
+      this.isLoading = true
       const oldTable = this.MerageTables
       const newTable = this.MerageTabless
       if (oldTable && newTable) {
@@ -979,6 +1031,9 @@ export default {
           setTimeout(function () {
             router.push({name: 'NewHome'})
           }, 3000)
+        }).catch(err => {
+          this.isLoading = false
+          console.log('err=>', err)
         })
       }
     },
@@ -999,6 +1054,7 @@ export default {
       })
     },
     transferTable () {
+      this.isLoading = true
       console.log('Old Table', this.transferTables)
       console.log('New Table', this.transferTabless)
       const oldTable = this.transferTables
@@ -1012,6 +1068,9 @@ export default {
         setTimeout(function () {
           router.push({name: 'NewHome'})
         }, 3000)
+      }).catch(err => {
+        this.isLoading = false
+        console.log('err=>', err)
       })
     },
     TransferTableFun () {
@@ -1027,7 +1086,7 @@ export default {
     },
     rePrintOrder () {
       var TblNumber = localStorage.getItem('TableNumber')
-      axios.rePrintKOT(TblNumber).then(res => {
+      axios.rePrintKOT(TblNumber, this.caption).then(res => {
         this.snackbarcolor = 'success'
         this.snackbarText = 'Re-printing the order....'
         this.snackbar = true
@@ -1051,6 +1110,9 @@ export default {
     },
     home () {
       router.push({name: 'NewHome'})
+    },
+    saveCaption () {
+      localStorage.setItem('caption', this.caption)
     }
   }
 }
@@ -1061,9 +1123,26 @@ export default {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  padding: 0;
 }
 .itemList {
   flex-grow: 1;
   overflow-x: auto;
+}
+>>> .v-text-field__details {
+  display: none;
+}
+>>> .v-list--two-line .v-list__tile {
+  height: 35px;
+  font-size: 13px;
+}
+>>> .v-chip {
+  font-size: 10px;
+}
+>>> .v-toolbar__content {
+  height: 38px !important;
+}
+.card-title {
+  padding: 8px 10px 0px 5px;
 }
 </style>
