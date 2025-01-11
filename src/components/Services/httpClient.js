@@ -241,24 +241,24 @@ class Axios {
       return response.data
     })
   }
-  printKOT (tableId, cap) {
-    const printKOTURL = process.env.API_BASE.concat(`/api/PrintKOT?cap=${cap}&tableId=`).concat(tableId).concat('&print=Y&reprint=N&cancelled=N')
+  printKOT (tableId, userId, cap) {
+    const printKOTURL = process.env.API_BASE.concat(`/api/PrintKOT?userId=${userId}&cap=${cap}&tableId=`).concat(tableId).concat('&print=Y&reprint=N&cancelled=N')
     return this.axios.get(printKOTURL, {
       timeout: 50000
     }).then(response => {
       return response.data
     })
   }
-  rePrintKOT (tableId, cap) {
-    const rePrintKOTURL = process.env.API_BASE.concat(`/api/PrintKOT?cap=${cap}&tableId=`).concat(tableId).concat('&print=N&reprint=Y&cancelled=N')
+  rePrintKOT (tableId, userId, cap) {
+    const rePrintKOTURL = process.env.API_BASE.concat(`/api/PrintKOT?userId=${userId}&cap=${cap}&tableId=`).concat(tableId).concat('&print=N&reprint=Y&cancelled=N')
     return this.axios.get(rePrintKOTURL, {
       timeout: 50000
     }).then(response => {
       return response.data
     })
   }
-  cancelPrintKOT (KCATID, KOTNO, itemName, cancelledQty, tableName, wtrId, PAX, cap) {
-    const cancelPrintKOTURL = process.env.API_BASE.concat(`/api/CancellSingleItemPrint?cap=${cap}&KCATID=`).concat(KCATID).concat('&KOTNO=').concat(KOTNO).concat('&itemName=').concat(itemName).concat('&cancelledQty=').concat(cancelledQty).concat('&tableName=').concat(tableName).concat('&wtrId=').concat(wtrId).concat('&PAX=').concat(PAX)
+  cancelPrintKOT (KCATID, KOTNO, itemName, cancelledQty, tableName, userId, wtrId, PAX, cap) {
+    const cancelPrintKOTURL = process.env.API_BASE.concat(`/api/CancellSingleItemPrint?userId=${userId}&cap=${cap}&KCATID=`).concat(KCATID).concat('&KOTNO=').concat(KOTNO).concat('&itemName=').concat(itemName).concat('&cancelledQty=').concat(cancelledQty).concat('&tableName=').concat(tableName).concat('&wtrId=').concat(wtrId).concat('&PAX=').concat(PAX)
     return this.axios.get(cancelPrintKOTURL, {
       timeout: 50000
     }).then(response => {

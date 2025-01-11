@@ -900,7 +900,7 @@ export default {
                 axios.updateTableStatus(localStorage.getItem('TableNumber')).then((response) => {
                 })
                 // send for Print
-                axios.printKOT(localStorage.getItem('TableNumber'), this.caption).then(res => {
+                axios.printKOT(localStorage.getItem('TableNumber'), localStorage.getItem('UserID'), this.caption).then(res => {
                   this.snackbarcolor = 'success'
                   this.snackbarText = 'Order Printing...'
                   this.snackbar = true
@@ -981,12 +981,13 @@ export default {
         let KCATID = this.editActiveOrderItem.KCATID
         let ItemName = this.editActiveOrderItem.ItemName
         let tableName = localStorage.getItem('TableName')
+        let userId = localStorage.getItem('UserID')
         let wtrId = this.waiterId
         let PAX = this.paxId
         console.log(QuantityToRemove, KotNumber, ItemId)
         axios.cancelActiveOrderQuantity(KotNumber, ItemId, QuantityToRemove).then(data => {
           console.log('Response from server for cancel the Quantity', data)
-          axios.cancelPrintKOT(KCATID, KotNumber, ItemName, QuantityToRemove, tableName, wtrId, PAX, this.caption).then(res => {
+          axios.cancelPrintKOT(KCATID, KotNumber, ItemName, QuantityToRemove, tableName, userId, wtrId, PAX, this.caption).then(res => {
             console.log('cancel printout response', res)
             this.isLoading = false
           }).catch(err => {
@@ -1086,7 +1087,8 @@ export default {
     },
     rePrintOrder () {
       var TblNumber = localStorage.getItem('TableNumber')
-      axios.rePrintKOT(TblNumber, this.caption).then(res => {
+      var userId = localStorage.getItem('UserID')
+      axios.rePrintKOT(TblNumber, userId, this.caption).then(res => {
         this.snackbarcolor = 'success'
         this.snackbarText = 'Re-printing the order....'
         this.snackbar = true
