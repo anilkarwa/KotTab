@@ -8,6 +8,9 @@
         <v-toolbar-title style="font-size: 14px" class="white--text">POSTAB</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-title class="white--text">      
+          <span>{{ userName}}</span>
+        </v-toolbar-title>
+        <v-toolbar-title class="white--text">      
           <v-icon @click="tableSelectionDialog = true">account_circle</v-icon>
         </v-toolbar-title>
         <!-- <v-toolbar-title class="white--text">Designed By <a href="http://www.softvent.com/">Softvent.com</a></v-toolbar-title> -->

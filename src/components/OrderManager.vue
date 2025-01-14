@@ -884,7 +884,7 @@ export default {
               TableId: localStorage.getItem('TableNumber'),
               WaiterId: this.waiterId,
               PAX: this.paxId,
-              AddedBy: 'User 1',
+              AddedBy: localStorage.getItem('UserName'),
               KOTDate: this.getKOTDate(),
               TimeOfKOT: this.getKOTTime(),
               AddedDateTime: this.getKOTDate() + ' ' + this.getKOTTime(),
